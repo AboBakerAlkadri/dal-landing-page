@@ -100,10 +100,6 @@
             <i class="fa-solid fa-book-open" aria-hidden="true"></i>
             دليل استخدام التطبيق
           </a>
-          <a class="action-link" href="#" data-link="blog">
-            <i class="fa-solid fa-lightbulb" aria-hidden="true"></i>
-            نصائح البيع والشراء
-          </a>
           <a class="action-link" href="#" data-link="rateApp">
             <i class="fa-solid fa-star" aria-hidden="true"></i>
             قيّم تطبيق دال
@@ -185,18 +181,28 @@
 
         <div class="form-step" data-step="2">
           <h3>الجمهور المستهدف</h3>
-          <label>
-            المناطق المستهدفة داخل سوريا
-            <input type="text" name="regions" placeholder="مثال: دمشق، حلب، حمص" required>
-          </label>
+          <div class="two-cols">
+            <label>
+              المحافظة
+              <select name="governorate" required>
+                <option value="">اختر المحافظة</option>
+              </select>
+            </label>
+            <label>
+              المدينة
+              <select name="city" required disabled>
+                <option value="">اختر المدينة</option>
+              </select>
+            </label>
+          </div>
           <div class="two-cols">
             <label>
               العمر من
-              <input type="number" name="ageFrom" min="13" max="80" placeholder="18" required>
+              <input type="number" name="ageFrom" min="18" max="60" value="18" required>
             </label>
             <label>
               العمر إلى
-              <input type="number" name="ageTo" min="13" max="80" placeholder="45" required>
+              <input type="number" name="ageTo" min="18" max="60" value="60" required>
             </label>
           </div>
           <label>
@@ -228,6 +234,14 @@
             <textarea name="caption" rows="5" placeholder="اكتب نص الإعلان هنا" required></textarea>
           </label>
           <label>
+            الوصف المختصر
+            <input type="text" name="shortDescription" maxlength="90" placeholder="مثال: عروض عقارات وسيارات وخدمات على دال">
+          </label>
+          <label>
+            الوصف الطويل
+            <textarea name="longDescription" rows="4" placeholder="اكتب تفاصيل إضافية تظهر أسفل معاينة الإعلان"></textarea>
+          </label>
+          <label>
             رفع صورة أو أكثر للإعلان اختياري
             <input type="file" name="adImages" accept="image/*" multiple>
           </label>
@@ -237,14 +251,36 @@
               <img src="dal-icon.jpg" alt="">
               <div>
                 <strong>تطبيق دال</strong>
-                <span>إعلان ممول</span>
+                <span>إعلان ممول · <i class="fa-solid fa-earth-americas" aria-hidden="true"></i></span>
               </div>
             </div>
             <p id="previewText">سيظهر نص الإعلان هنا أثناء الكتابة.</p>
+            <div class="preview-meta">
+              <strong id="previewShort">وصف مختصر للحملة</strong>
+              <span id="previewLong">تفاصيل الإعلان تظهر هنا بشكل مشابه لإعلانات فيسبوك.</span>
+            </div>
             <div class="preview-image" id="previewImage">
               <i class="fa-regular fa-image" aria-hidden="true"></i>
             </div>
-            <button type="button">إرسال رسالة</button>
+            <div class="carousel-controls" id="carouselControls" hidden>
+              <button type="button" id="prevImage" aria-label="الصورة السابقة">
+                <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+              </button>
+              <span id="imageCounter">1 / 1</span>
+              <button type="button" id="nextImage" aria-label="الصورة التالية">
+                <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
+              </button>
+            </div>
+            <div class="preview-stats">
+              <span><i class="fa-solid fa-thumbs-up" aria-hidden="true"></i> 128</span>
+              <span>24 تعليق · 9 مشاركات</span>
+            </div>
+            <div class="preview-actions">
+              <button type="button"><i class="fa-regular fa-thumbs-up" aria-hidden="true"></i> أعجبني</button>
+              <button type="button"><i class="fa-regular fa-comment" aria-hidden="true"></i> تعليق</button>
+              <button type="button"><i class="fa-regular fa-share-from-square" aria-hidden="true"></i> مشاركة</button>
+            </div>
+            <button class="message-preview-btn" type="button">إرسال رسالة</button>
           </article>
         </div>
 

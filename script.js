@@ -8,7 +8,7 @@ const LINKS = {
   about: "https://dalsyria.com/about-us",
   support: "https://dalsyria.com/techsupport",
   blog: "https://dalsyria.com/blog",
-  help: "https://dalsyria.com/help",
+  help: "https://dalsyria.com/blogs",
   rateApp: "https://play.google.com/store/apps/details?id=com.yashamDigital.dal&hl=en",
   whatsapp: "https://wa.me/963939769472",
   facebook: "https://www.facebook.com/dalsyriacom",
@@ -29,11 +29,36 @@ const nextStepButton = document.getElementById("nextStep");
 const submitButton = document.getElementById("submitCampaign");
 const formMessage = document.getElementById("formMessage");
 const previewText = document.getElementById("previewText");
+const previewShort = document.getElementById("previewShort");
+const previewLong = document.getElementById("previewLong");
 const previewImage = document.getElementById("previewImage");
+const carouselControls = document.getElementById("carouselControls");
+const prevImageButton = document.getElementById("prevImage");
+const nextImageButton = document.getElementById("nextImage");
+const imageCounter = document.getElementById("imageCounter");
 
 let currentStep = 1;
+let previewImageUrls = [];
+let currentImageIndex = 0;
 const PRELOADER_MIN_TIME = 1400;
 const pageStartTime = Date.now();
+
+const SYRIA_LOCATIONS = {
+  "دمشق": ["دمشق", "المزة", "المالكي", "أبو رمانة", "كفرسوسة", "الميدان", "برزة", "جرمانا"],
+  "ريف دمشق": ["دوما", "داريا", "قدسيا", "صحنايا", "التل", "النبك", "الزبداني", "يبرود"],
+  "حلب": ["حلب", "اعزاز", "الباب", "منبج", "عفرين", "السفيرة", "جرابلس", "عين العرب"],
+  "حمص": ["حمص", "تدمر", "الرستن", "تلكلخ", "القصير", "المخرم", "الحولة"],
+  "حماة": ["حماة", "مصياف", "السلمية", "محردة", "صوران", "طيبة الإمام", "كفرزيتا"],
+  "اللاذقية": ["اللاذقية", "جبلة", "القرداحة", "الحفة", "رأس البسيط", "صلنفة"],
+  "طرطوس": ["طرطوس", "بانياس", "صافيتا", "الدريكيش", "الشيخ بدر", "مشتى الحلو"],
+  "إدلب": ["إدلب", "أريحا", "جسر الشغور", "معرة النعمان", "سراقب", "خان شيخون"],
+  "درعا": ["درعا", "نوى", "الصنمين", "إزرع", "طفس", "بصرى الشام", "جاسم"],
+  "السويداء": ["السويداء", "شهبا", "صلخد", "القريا", "عرمان", "ملح"],
+  "القنيطرة": ["القنيطرة", "خان أرنبة", "جباتا الخشب", "البعث", "حضر"],
+  "دير الزور": ["دير الزور", "الميادين", "البوكمال", "العشارة", "موحسن", "القورية"],
+  "الرقة": ["الرقة", "الطبقة", "تل أبيض", "معدان", "الكرامة", "المنصورة"],
+  "الحسكة": ["الحسكة", "القامشلي", "المالكية", "رأس العين", "عامودا", "الدرباسية"]
+};
 
 window.addEventListener("load", () => {
   const preloader = document.getElementById("preloader");
@@ -61,6 +86,8 @@ document.querySelectorAll("[data-link]").forEach((element) => {
     }
   }
 });
+
+populateGovernorates();
 
 openCampaign.addEventListener("click", () => {
   modal.classList.add("is-open");
@@ -114,7 +141,10 @@ form.addEventListener("input", () => {
   updatePreview();
 });
 
+form.governorate.addEventListener("change", updateCities);
 form.adImages.addEventListener("change", updatePreviewImage);
+prevImageButton.addEventListener("click", () => showPreviewImage(currentImageIndex - 1));
+nextImageButton.addEventListener("click", () => showPreviewImage(currentImageIndex + 1));
 
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
@@ -146,6 +176,7 @@ form.addEventListener("submit", async (event) => {
 
     form.reset();
     currentStep = 1;
+    updateCities();
     updateEstimate();
     updatePreview();
     updatePreviewImage();
@@ -173,10 +204,18 @@ function validateCurrentStep() {
 
   const ageFrom = Number(form.ageFrom.value);
   const ageTo = Number(form.ageTo.value);
-  if (currentStep === 2 && ageFrom && ageTo && ageFrom > ageTo) {
-    showMessage("العمر من يجب أن يكون أقل من أو يساوي العمر إلى.", "error");
-    form.ageFrom.focus();
-    return false;
+  if (currentStep === 2) {
+    if (ageFrom < 18 || ageFrom > 60 || ageTo < 18 || ageTo > 60) {
+      showMessage("العمر يجب أن يكون بين 18 و60 سنة.", "error");
+      form.ageFrom.focus();
+      return false;
+    }
+
+    if (ageFrom > ageTo) {
+      showMessage("العمر من يجب أن يكون أقل من أو يساوي العمر إلى.", "error");
+      form.ageFrom.focus();
+      return false;
+    }
   }
 
   clearMessage();
@@ -207,22 +246,61 @@ function getAudienceQuality(budget, days) {
 
 function updatePreview() {
   const caption = form.caption.value.trim();
+  const shortDescription = form.shortDescription.value.trim();
+  const longDescription = form.longDescription.value.trim();
+
   previewText.textContent = caption || "سيظهر نص الإعلان هنا أثناء الكتابة.";
+  previewShort.textContent = shortDescription || "وصف مختصر للحملة";
+  previewLong.textContent = longDescription || "تفاصيل الإعلان تظهر هنا بشكل مشابه لإعلانات فيسبوك.";
 }
 
 function updatePreviewImage() {
-  const file = form.adImages.files[0];
+  previewImageUrls.forEach((url) => URL.revokeObjectURL(url));
+  previewImageUrls = Array.from(form.adImages.files).map((file) => URL.createObjectURL(file));
+  currentImageIndex = 0;
+  showPreviewImage(0);
+}
+
+function showPreviewImage(index) {
   previewImage.innerHTML = "";
 
-  if (!file) {
+  if (!previewImageUrls.length) {
     previewImage.innerHTML = '<i class="fa-regular fa-image" aria-hidden="true"></i>';
+    carouselControls.hidden = true;
     return;
   }
 
+  currentImageIndex = (index + previewImageUrls.length) % previewImageUrls.length;
+
   const image = document.createElement("img");
-  image.src = URL.createObjectURL(file);
-  image.alt = "معاينة صورة الإعلان";
+  image.src = previewImageUrls[currentImageIndex];
+  image.alt = `معاينة صورة الإعلان ${currentImageIndex + 1}`;
   previewImage.appendChild(image);
+
+  carouselControls.hidden = previewImageUrls.length < 2;
+  imageCounter.textContent = `${currentImageIndex + 1} / ${previewImageUrls.length}`;
+}
+
+function populateGovernorates() {
+  Object.keys(SYRIA_LOCATIONS).forEach((governorate) => {
+    const option = document.createElement("option");
+    option.value = governorate;
+    option.textContent = governorate;
+    form.governorate.appendChild(option);
+  });
+}
+
+function updateCities() {
+  const cities = SYRIA_LOCATIONS[form.governorate.value] || [];
+  form.city.innerHTML = '<option value="">اختر المدينة</option>';
+  form.city.disabled = cities.length === 0;
+
+  cities.forEach((city) => {
+    const option = document.createElement("option");
+    option.value = city;
+    option.textContent = city;
+    form.city.appendChild(option);
+  });
 }
 
 function buildPayload() {
@@ -241,12 +319,16 @@ function buildPayload() {
     totalReach,
     totalCost: budget,
     audienceQuality: getAudienceQuality(budget, days),
-    regions: form.regions.value.trim(),
+    governorate: form.governorate.value,
+    city: form.city.value,
+    regions: `${form.governorate.value} - ${form.city.value}`,
     ageFrom: form.ageFrom.value,
     ageTo: form.ageTo.value,
     gender: form.gender.value,
     interests: form.interests.value.trim(),
     caption: form.caption.value.trim(),
+    shortDescription: form.shortDescription.value.trim(),
+    longDescription: form.longDescription.value.trim(),
     imageFileName: fileNames,
     phone: form.phone.value.trim(),
     customerName: form.customerName.value.trim()
