@@ -292,7 +292,7 @@ form.addEventListener("submit", async (event) => {
     updateLanguageSummary();
     updateStep();
     alert("تم إرسال طلبك بنجاح، سيتواصل معك فريق دال قريبًا.");
-    showMessage("تم إرسال طلبك بنجاح، سيتواصل معك فريق دال قريبًا.", "success");
+    clearMessage();
   } catch (error) {
     showMessage(`حدث خطأ أثناء الإرسال، يرجى المحاولة مرة أخرى. ${error.message || ""}`, "error");
   } finally {
@@ -641,7 +641,6 @@ async function buildPayload() {
   const days = Number(form.days.value) || 0;
   const dailyReach = Math.round((days > 0 ? budget / days : 0) * 850);
   const totalReach = dailyReach * days;
-  const fileNames = Array.from(form.adImages.files).map((file) => file.name).join(", ");
   const imageFiles = await filesToBase64(form.adImages.files);
   const logoFileName = form.companyLogo.files[0]?.name || "";
   const selectedGovernorates = getSelectedGovernorates();
@@ -671,7 +670,6 @@ async function buildPayload() {
     longDescription: form.longDescription.value.trim(),
     whatsappNumber: form.whatsappNumber.value.trim(),
     destinationUrl: form.destinationUrl.value.trim(),
-    imageFileName: fileNames,
     imageFiles,
     logoFileName,
     phone: form.phone.value.trim(),
