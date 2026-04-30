@@ -482,6 +482,22 @@ label {
   font-weight: 700;
 }
 
+.goal-extra-field[hidden] {
+  display: none;
+}
+
+.goal-extra-field {
+  margin: -2px 0 4px;
+  padding: 12px;
+  border: 1px solid rgba(255, 224, 27, 0.22);
+  border-radius: 16px;
+  background: rgba(255, 224, 27, 0.06);
+}
+
+.goal-extra-field label {
+  margin-bottom: 0;
+}
+
 input,
 select,
 textarea {
@@ -602,7 +618,7 @@ textarea:focus {
 .facebook-carousel {
   display: grid;
   grid-auto-flow: column;
-  grid-auto-columns: minmax(220px, 82%);
+  grid-auto-columns: minmax(148px, calc((100% - 10px) / 2));
   gap: 10px;
   overflow-x: auto;
   overscroll-behavior-inline: contain;
@@ -610,6 +626,10 @@ textarea:focus {
   padding: 0 12px 12px;
   direction: rtl;
   scrollbar-width: none;
+}
+
+.facebook-carousel.is-single {
+  grid-auto-columns: 100%;
 }
 
 .facebook-carousel::-webkit-scrollbar {
@@ -626,7 +646,7 @@ textarea:focus {
 
 .carousel-card img {
   width: 100%;
-  height: 250px;
+  height: 210px;
   display: block;
   object-fit: cover;
 }

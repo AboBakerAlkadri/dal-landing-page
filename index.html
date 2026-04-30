@@ -161,6 +161,18 @@
               <option value="زيارات الموقع والتطبيق">زيارات الموقع والتطبيق</option>
             </select>
           </label>
+          <div class="goal-extra-field" id="whatsappGoalField" hidden>
+            <label>
+              رقم واتساب لاستقبال الرسائل
+              <input type="tel" name="whatsappNumber" placeholder="مثال: 963939769472">
+            </label>
+          </div>
+          <div class="goal-extra-field" id="destinationGoalField" hidden>
+            <label>
+              رابط الموقع أو التطبيق
+              <input type="url" name="destinationUrl" placeholder="https://example.com">
+            </label>
+          </div>
           <div class="two-cols">
             <label>
               الميزانية بالدولار
@@ -271,7 +283,7 @@
               <button type="button"><i class="fa-regular fa-comment" aria-hidden="true"></i> تعليق</button>
               <button type="button"><i class="fa-regular fa-share-from-square" aria-hidden="true"></i> مشاركة</button>
             </div>
-            <button class="message-preview-btn" type="button">إرسال رسالة</button>
+            <button class="message-preview-btn" id="previewCta" type="button">إرسال رسالة</button>
           </article>
         </div>
 

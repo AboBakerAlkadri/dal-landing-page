@@ -32,6 +32,9 @@ const previewText = document.getElementById("previewText");
 const previewShort = document.getElementById("previewShort");
 const previewLong = document.getElementById("previewLong");
 const previewImage = document.getElementById("previewImage");
+const previewCta = document.getElementById("previewCta");
+const whatsappGoalField = document.getElementById("whatsappGoalField");
+const destinationGoalField = document.getElementById("destinationGoalField");
 
 let currentStep = 1;
 let previewImageUrls = [];
@@ -136,6 +139,7 @@ form.addEventListener("input", () => {
   updatePreview();
 });
 
+form.campaignGoal.addEventListener("change", updateGoalFields);
 form.governorate.addEventListener("change", updateCities);
 form.adImages.addEventListener("change", updatePreviewImage);
 
@@ -245,10 +249,38 @@ function updatePreview() {
   previewText.textContent = caption || "سيظهر نص الإعلان هنا أثناء الكتابة.";
   previewShort.textContent = shortDescription || "وصف مختصر للحملة";
   previewLong.textContent = longDescription || "تفاصيل الإعلان تظهر هنا بشكل مشابه لإعلانات فيسبوك.";
+  previewCta.textContent = getPreviewCtaText(form.campaignGoal.value);
 
   if (previewImageUrls.length) {
     renderPreviewCarousel();
   }
+}
+
+function updateGoalFields() {
+  const goal = form.campaignGoal.value;
+  const needsWhatsapp = goal === "تلقي رسائل واتساب/ماسنجر";
+  const needsDestination = goal === "زيارات الموقع والتطبيق";
+
+  whatsappGoalField.hidden = !needsWhatsapp;
+  destinationGoalField.hidden = !needsDestination;
+  form.whatsappNumber.required = needsWhatsapp;
+  form.destinationUrl.required = needsDestination;
+
+  if (!needsWhatsapp) form.whatsappNumber.value = "";
+  if (!needsDestination) form.destinationUrl.value = "";
+
+  updatePreview();
+}
+
+function getPreviewCtaText(goal) {
+  const ctaMap = {
+    "الوعي والانتشار CPM": "معرفة المزيد",
+    "التفاعل والمشاركات": "زيارة الملف الشخصي",
+    "تلقي رسائل واتساب/ماسنجر": "إرسال رسالة",
+    "زيارات الموقع والتطبيق": "زيارة الرابط"
+  };
+
+  return ctaMap[goal] || "إرسال رسالة";
 }
 
 function updatePreviewImage() {
@@ -270,7 +302,7 @@ function renderPreviewCarousel() {
   }
 
   const carousel = document.createElement("div");
-  carousel.className = "facebook-carousel";
+  carousel.className = `facebook-carousel ${previewImageUrls.length === 1 ? "is-single" : "is-multiple"}`;
 
   previewImageUrls.forEach((item) => {
     const card = document.createElement("article");
@@ -291,7 +323,7 @@ function renderPreviewCarousel() {
 
     const button = document.createElement("button");
     button.type = "button";
-    button.textContent = "عرض التفاصيل";
+    button.textContent = getPreviewCtaText(form.campaignGoal.value);
 
     body.append(title, price, button);
     card.append(image, body);
@@ -349,6 +381,8 @@ function buildPayload() {
     caption: form.caption.value.trim(),
     shortDescription: form.shortDescription.value.trim(),
     longDescription: form.longDescription.value.trim(),
+    whatsappNumber: form.whatsappNumber.value.trim(),
+    destinationUrl: form.destinationUrl.value.trim(),
     imageFileName: fileNames,
     phone: form.phone.value.trim(),
     customerName: form.customerName.value.trim()

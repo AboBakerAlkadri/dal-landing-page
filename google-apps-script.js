@@ -41,6 +41,8 @@ function doPost(e) {
       data.caption || "",
       data.shortDescription || "",
       data.longDescription || "",
+      data.whatsappNumber || "",
+      data.destinationUrl || "",
       data.imageFileName || "",
       data.phone || "",
       data.customerName || ""
