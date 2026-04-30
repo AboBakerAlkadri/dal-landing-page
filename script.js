@@ -1,4 +1,4 @@
-const GOOGLE_SCRIPT_URL = "PUT_YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE";
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz8YdD-941kwCjCTWzgu2qxVYCiYlFgGMhJI1GOIARXuGzmG_2e5EMLy73WWaS1W0E-/exec";
 
 const LINKS = {
   googlePlay: "https://play.google.com/store/apps/details?id=com.yashamDigital.dal&gl=DE",
