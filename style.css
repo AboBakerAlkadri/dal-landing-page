@@ -1130,13 +1130,8 @@ button:disabled {
     height: 124px;
   }
 
-  .download-grid,
   .two-cols {
     grid-template-columns: 1fr 1fr;
-  }
-
-  .store-btn--wide {
-    grid-column: 1 / -1;
   }
 
   .links-layout {
