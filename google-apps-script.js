@@ -31,7 +31,6 @@ function doPost(e) {
       data.dailyReach || "",
       data.totalReach || "",
       data.totalCost || "",
-      data.audienceQuality || "",
       data.governorate || "",
       data.governorates || "",
       data.city || "",

@@ -10,19 +10,26 @@ const LINKS = {
   blog: "https://dalsyria.com/blog",
   help: "https://dalsyria.com/blogs",
   rateApp: "https://play.google.com/store/apps/details?id=com.yashamDigital.dal&hl=en",
+  jobs: "https://dalsyria.com/jobs",
+  jobsApply: "https://dalsyria.com/jobs/apply",
   whatsapp: "https://wa.me/963939769472",
   facebook: "https://www.facebook.com/dalsyriacom",
   instagram: "https://www.instagram.com/dalsyriacom",
   tiktok: "https://www.tiktok.com/@dalsyriacom",
   youtube: "https://www.youtube.com/@Dalsyriacom",
   linkedin: "https://www.linkedin.com/company/dalsyriacom/",
-  email: "mailto:support@dalsyria.com",
   phone: "tel:0939769472"
 };
 
 const modal = document.getElementById("campaignModal");
 const openCampaign = document.getElementById("openCampaign");
+const openCampaignBanner = document.getElementById("openCampaignBanner");
 const closeModalButtons = document.querySelectorAll("[data-close-modal]");
+const iframeModal = document.getElementById("iframeModal");
+const linkFrame = document.getElementById("linkFrame");
+const iframeTitle = document.getElementById("iframeTitle");
+const quickContactToggle = document.getElementById("quickContactToggle");
+const quickContactMenu = document.getElementById("quickContactMenu");
 const form = document.getElementById("campaignForm");
 const prevStepButton = document.getElementById("prevStep");
 const nextStepButton = document.getElementById("nextStep");
@@ -61,23 +68,23 @@ const SYRIA_LOCATIONS = {
 
 const GOAL_PREVIEW_CONFIG = {
   reach: {
-    cta: "Learn More",
+    cta: "معرفة المزيد",
     tone: "awareness"
   },
   engagement: {
-    cta: "View Profile",
+    cta: "زيارة الملف الشخصي",
     tone: "engagement"
   },
   messages: {
-    cta: "Send Message",
+    cta: "إرسال رسالة",
     tone: "messages"
   },
   calls: {
-    cta: "Call Now",
+    cta: "اتصال الآن",
     tone: "calls"
   },
   traffic: {
-    cta: "Visit Website",
+    cta: "زيارة الموقع",
     tone: "traffic"
   }
 };
@@ -102,9 +109,11 @@ document.querySelectorAll("[data-link]").forEach((element) => {
   const key = element.dataset.link;
   if (LINKS[key]) {
     element.href = LINKS[key];
-    if (!LINKS[key].startsWith("tel:") && !LINKS[key].startsWith("mailto:")) {
-      element.target = "_blank";
-      element.rel = "noopener noreferrer";
+    if (LINKS[key].startsWith("http") && !element.hasAttribute("data-direct-link")) {
+      element.addEventListener("click", (event) => {
+        event.preventDefault();
+        openIframe(LINKS[key], element.textContent.trim() || "تطبيق دال");
+      });
     }
   }
 });
@@ -112,14 +121,28 @@ document.querySelectorAll("[data-link]").forEach((element) => {
 populateGovernorates();
 
 openCampaign.addEventListener("click", () => {
+  openCampaignModal();
+});
+
+openCampaignBanner.addEventListener("click", openCampaignModal);
+
+function openCampaignModal() {
   modal.classList.add("is-open");
   modal.setAttribute("aria-hidden", "false");
   document.body.style.overflow = "hidden";
   updateGoalFields();
-});
+}
 
 closeModalButtons.forEach((button) => {
   button.addEventListener("click", closeModal);
+});
+
+document.querySelectorAll("[data-close-iframe]").forEach((button) => {
+  button.addEventListener("click", closeIframe);
+});
+
+quickContactToggle.addEventListener("click", () => {
+  quickContactMenu.hidden = !quickContactMenu.hidden;
 });
 
 document.addEventListener("keydown", (event) => {
@@ -132,6 +155,21 @@ function closeModal() {
   modal.classList.remove("is-open");
   modal.setAttribute("aria-hidden", "true");
   document.body.style.overflow = "";
+}
+
+function openIframe(url, title) {
+  iframeTitle.textContent = title || "تطبيق دال";
+  linkFrame.src = url;
+  iframeModal.classList.add("is-open");
+  iframeModal.setAttribute("aria-hidden", "false");
+  document.body.style.overflow = "hidden";
+}
+
+function closeIframe() {
+  iframeModal.classList.remove("is-open");
+  iframeModal.setAttribute("aria-hidden", "true");
+  linkFrame.src = "about:blank";
+  document.body.style.overflow = modal.classList.contains("is-open") ? "hidden" : "";
 }
 
 function updateStep() {
@@ -318,20 +356,10 @@ function updateEstimate() {
   const dailyBudget = days > 0 ? budget / days : 0;
   const dailyReach = Math.round(dailyBudget * 850);
   const totalReach = dailyReach * days;
-  const quality = getAudienceQuality(budget, days);
 
   document.getElementById("dailyReach").textContent = formatNumber(dailyReach);
   document.getElementById("totalReach").textContent = formatNumber(totalReach);
   document.getElementById("totalCost").textContent = `$${formatNumber(budget)}`;
-  document.getElementById("audienceQuality").textContent = quality;
-}
-
-function getAudienceQuality(budget, days) {
-  if (!budget || !days) return "Needs data";
-  const dailyBudget = budget / days;
-  if (dailyBudget >= 15) return "Strong";
-  if (dailyBudget >= 7) return "Good";
-  return "Limited";
 }
 
 function updatePreview() {
@@ -367,13 +395,13 @@ function getGoalPreviewConfig() {
 
   if (goalType === "traffic" && isAppDestination(form.destinationUrl.value)) {
     return {
-      cta: "Install Now",
+      cta: "تثبيت الآن",
       tone: "traffic"
     };
   }
 
   return GOAL_PREVIEW_CONFIG[goalType] || {
-    cta: "Choose Campaign Goal",
+    cta: "اختر هدف الحملة",
     tone: "default"
   };
 }
@@ -529,7 +557,6 @@ function buildPayload() {
     dailyReach,
     totalReach,
     totalCost: budget,
-    audienceQuality: getAudienceQuality(budget, days),
     governorate: selectedGovernorates.join(", "),
     governorates: selectedGovernorates.join(", "),
     city: "",

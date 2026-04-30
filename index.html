@@ -13,7 +13,7 @@
   <link rel="icon" href="dal-icon.jpg">
   <link rel="preconnect" href="https://cdnjs.cloudflare.com">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <link rel="stylesheet" href="style.css?v=20260430-final-goals-interests">
+  <link rel="stylesheet" href="style.css?v=20260430-ui-cleanup">
 </head>
 <body>
   <div class="preloader" id="preloader" aria-label="جارٍ تحميل الصفحة">
@@ -26,33 +26,36 @@
 
   <main class="page-shell">
     <section class="hero" aria-labelledby="main-title">
-      <div class="brand-mark">
-        <img src="dal-icon.jpg" alt="شعار تطبيق دال">
+      <div class="hero-brand-row">
+        <div class="brand-mark">
+          <img src="dal-icon.jpg" alt="شعار تطبيق دال">
+        </div>
+        <div class="hero-text">
+          <h1 id="main-title">تطبيق دال</h1>
+          <p class="hero-subtitle">أضخم منصة إعلانات مجانية في سوريا</p>
+          <p class="hero-copy">بيع وشراء عقارات، مركبات، إلكترونيات، وظائف بدون عمولة</p>
+        </div>
       </div>
-      <p class="eyebrow">منصة الإعلانات الأسرع وصولًا</p>
-      <h1 id="main-title">تطبيق دال</h1>
-      <p class="hero-subtitle">أضخم منصة إعلانات مجانية في سوريا</p>
-      <p class="hero-copy">بيع وشراء عقارات، مركبات، إلكترونيات، وظائف وخدمات بدون عمولة</p>
       <div class="primary-cta" role="text">
         <i class="fa-solid fa-download" aria-hidden="true"></i>
-        حمّل التطبيق الآن
+        حمل التطبيق الآن
       </div>
     </section>
 
     <section class="section-panel" aria-labelledby="download-title">
-      <h2 id="download-title">روابط التحميل</h2>
+      <h2 id="download-title">حمل التطبيق الآن</h2>
       <div class="download-grid">
         <a class="store-btn" href="#" data-link="googlePlay">
           <i class="fa-brands fa-google-play" aria-hidden="true"></i>
-          <span>Google Play</span>
+          <span>Google Play | جوجل بلاي</span>
         </a>
         <a class="store-btn" href="#" data-link="appStore">
           <i class="fa-brands fa-apple" aria-hidden="true"></i>
-          <span>App Store</span>
+          <span>App Store | أب ستور</span>
         </a>
         <a class="store-btn store-btn--wide" href="#" data-link="alternativeDownload">
-          <i class="fa-solid fa-link" aria-hidden="true"></i>
-          <span>رابط تحميل بديل</span>
+          <i class="fa-brands fa-android" aria-hidden="true"></i>
+          <span>رابط تحميل لأجهزة الأندرويد</span>
         </a>
       </div>
       <p class="tiny-note">إذا لم يعمل Google Play أو App Store، فعّل VPN أو استخدم رابط التحميل البديل.</p>
@@ -60,13 +63,14 @@
 
     <section class="links-section" aria-label="روابط مهمة">
       <div class="links-banner">
-        <span>ابدأ الآن</span>
-        <strong>كل ما تحتاجه للبيع والشراء والإعلان في مكان واحد</strong>
+        <button class="campaign-glow" type="button" id="openCampaignBanner">
+          ابدأ حملتك الترويجية الآن
+        </button>
       </div>
 
       <div class="links-layout">
         <aside class="vertical-slide" aria-label="إعلان ممول">
-          <i class="fa-solid fa-bolt" aria-hidden="true"></i>
+          <i class="fa-solid fa-bullhorn" aria-hidden="true"></i>
           <strong>ضاعف وصول إعلانك</strong>
           <span>اطلب حملة ممولة خلال دقيقة</span>
         </aside>
@@ -80,21 +84,9 @@
             <i class="fa-solid fa-bullhorn" aria-hidden="true"></i>
             إطلاق حملة ترويجية جديدة
           </button>
-          <a class="action-link" href="#" data-link="support">
-            <i class="fa-solid fa-wallet" aria-hidden="true"></i>
-            إدارة الرصيد والمدفوعات
-          </a>
-          <a class="action-link" href="#" data-link="support">
-            <i class="fa-solid fa-chart-line" aria-hidden="true"></i>
-            تقارير الحملات الحالية
-          </a>
           <a class="action-link" href="#" data-link="about">
             <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
             تعرّف على تطبيق دال
-          </a>
-          <a class="action-link" href="#" data-link="support">
-            <i class="fa-solid fa-headset" aria-hidden="true"></i>
-            الدعم الفني
           </a>
           <a class="action-link" href="#" data-link="help">
             <i class="fa-solid fa-book-open" aria-hidden="true"></i>
@@ -104,6 +96,14 @@
             <i class="fa-solid fa-star" aria-hidden="true"></i>
             قيّم تطبيق دال
           </a>
+          <details class="jobs-dropdown">
+            <summary>
+              <i class="fa-solid fa-briefcase" aria-hidden="true"></i>
+              انضم إلى فريق دال - وظائف
+            </summary>
+            <a href="#" data-link="jobs">الوظائف المتاحة</a>
+            <a href="#" data-link="jobsApply">إرسال طلب انضمام</a>
+          </details>
         </div>
       </div>
     </section>
@@ -118,10 +118,6 @@
         <a href="#" data-link="linkedin" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
       </div>
       <div class="contact-links">
-        <a class="contact-item" href="#" data-link="email">
-          <span>support@dalsyria.com</span>
-          <i class="fa-solid fa-envelope" aria-hidden="true"></i>
-        </a>
         <a class="contact-item" href="#" data-link="phone">
           <span>0939769472</span>
           <i class="fa-solid fa-phone" aria-hidden="true"></i>
@@ -193,8 +189,7 @@
           <div class="estimate-card" aria-live="polite">
             <div><span>الوصول اليومي</span><strong id="dailyReach">0</strong></div>
             <div><span>إجمالي الوصول</span><strong id="totalReach">0</strong></div>
-            <div><span>إجمالي التكلفة</span><strong id="totalCost">0$</strong></div>
-            <div><span>جودة الجمهور</span><strong id="audienceQuality">تحتاج بيانات</strong></div>
+            <div><span>إجمالي التكلفة</span><strong id="totalCost">$0</strong></div>
           </div>
         </div>
 
@@ -286,16 +281,16 @@
             <input type="text" name="customerName" placeholder="اسمك">
           </label>
           <label>
-            رقم الهاتف اختياري
+            رقم هاتف المعلن
             <input type="tel" name="phone" placeholder="09xxxxxxxx">
           </label>
           <label>
-            رقم واتساب للتواصل
-            <input type="tel" name="whatsappNumber" placeholder="مثال: 963939769472">
+            رقم الهاتف في الإعلان
+            <input type="tel" name="contactNumber" placeholder="مثال: 0939769472">
           </label>
           <label>
-            رقم تواصل مباشر
-            <input type="tel" name="contactNumber" placeholder="مثال: 0939769472">
+            رقم واتساب
+            <input type="tel" name="whatsappNumber" placeholder="مثال: 963939769472">
           </label>
           <label>
             رابط الموقع الإلكتروني اختياري
@@ -343,7 +338,7 @@
               <button type="button"><i class="fa-regular fa-comment" aria-hidden="true"></i> تعليق</button>
               <button type="button"><i class="fa-regular fa-share-from-square" aria-hidden="true"></i> مشاركة</button>
             </div>
-            <button class="message-preview-btn" id="previewCta" type="button">Choose Campaign Goal</button>
+            <button class="message-preview-btn" id="previewCta" type="button">اختر هدف الحملة</button>
           </article>
         </div>
 
@@ -358,11 +353,28 @@
     </section>
   </div>
 
-  <a class="whatsapp-float" href="#" data-link="whatsapp">
+  <div class="quick-contact" id="quickContact">
+    <button class="whatsapp-float" type="button" id="quickContactToggle">
     <i class="fa-brands fa-whatsapp" aria-hidden="true"></i>
     تواصل معنا
-  </a>
+    </button>
+    <div class="quick-contact-menu" id="quickContactMenu" hidden>
+      <a href="#" data-link="whatsapp" data-direct-link><i class="fa-brands fa-whatsapp"></i> واتساب</a>
+      <a href="#" data-link="phone"><i class="fa-solid fa-phone"></i> اتصال</a>
+    </div>
+  </div>
 
-  <script src="script.js?v=20260430-final-goals-interests"></script>
+  <div class="modal iframe-modal" id="iframeModal" aria-hidden="true">
+    <div class="modal-backdrop" data-close-iframe></div>
+    <section class="iframe-card" role="dialog" aria-modal="true" aria-labelledby="iframeTitle">
+      <button class="close-btn" type="button" data-close-iframe aria-label="إغلاق">
+        <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+      </button>
+      <h2 id="iframeTitle">تطبيق دال</h2>
+      <iframe id="linkFrame" title="رابط دال"></iframe>
+    </section>
+  </div>
+
+  <script src="script.js?v=20260430-ui-cleanup"></script>
 </body>
 </html>

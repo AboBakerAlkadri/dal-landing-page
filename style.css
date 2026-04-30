@@ -104,14 +104,21 @@ button {
 }
 
 .hero {
-  text-align: center;
   padding: 16px 0 18px;
 }
 
+.hero-brand-row {
+  display: grid;
+  grid-template-columns: 98px 1fr;
+  align-items: center;
+  gap: 14px;
+  text-align: right;
+}
+
 .brand-mark {
-  width: 116px;
-  height: 116px;
-  margin: 0 auto 18px;
+  width: 98px;
+  height: 98px;
+  margin: 0;
   padding: 8px;
   border-radius: 50%;
   background: var(--yellow);
@@ -142,7 +149,7 @@ p {
 
 h1 {
   margin-bottom: 8px;
-  font-size: clamp(2.2rem, 12vw, 4rem);
+  font-size: clamp(2rem, 9vw, 3.5rem);
   line-height: 1;
 }
 
@@ -153,7 +160,7 @@ h1 {
 }
 
 .hero-copy {
-  margin: 0 auto 20px;
+  margin: 0 0 18px;
   color: var(--muted);
   line-height: 1.8;
   max-width: 31rem;
@@ -184,6 +191,7 @@ h1 {
 }
 
 .primary-cta {
+  margin-top: 16px;
   width: 100%;
 }
 
@@ -249,6 +257,31 @@ h1 {
   color: #111;
   background: linear-gradient(135deg, var(--yellow), #f4c400);
   box-shadow: 0 15px 34px rgba(255, 224, 27, 0.18);
+}
+
+.campaign-glow {
+  min-height: 58px;
+  border: 0;
+  border-radius: 18px;
+  color: #111;
+  background: linear-gradient(180deg, #fff06a, var(--yellow) 58%, #e5bd00);
+  box-shadow: 0 0 0 rgba(255, 224, 27, 0);
+  font-weight: 900;
+  font-size: 1.02rem;
+  animation: glowPulse 1.55s ease-in-out infinite;
+}
+
+@keyframes glowPulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 rgba(255, 224, 27, 0.16), 0 14px 28px rgba(255, 224, 27, 0.18);
+    filter: brightness(0.98);
+  }
+
+  50% {
+    box-shadow: 0 0 22px rgba(255, 224, 27, 0.58), 0 18px 38px rgba(255, 224, 27, 0.3);
+    filter: brightness(1.08);
+  }
 }
 
 .links-banner span {
@@ -317,6 +350,41 @@ button.action-link {
   color: var(--yellow);
 }
 
+.jobs-dropdown {
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: rgba(27, 31, 38, 0.9);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+
+.jobs-dropdown summary {
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 16px;
+  font-weight: 900;
+  cursor: pointer;
+  list-style: none;
+}
+
+.jobs-dropdown summary::-webkit-details-marker {
+  display: none;
+}
+
+.jobs-dropdown summary i {
+  color: var(--yellow);
+}
+
+.jobs-dropdown a {
+  display: block;
+  padding: 13px 16px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-weight: 800;
+}
+
 .social-panel {
   text-align: center;
   padding-top: 20px;
@@ -375,16 +443,51 @@ button.action-link {
   flex: 0 0 auto;
 }
 
-.whatsapp-float {
+.quick-contact {
   position: fixed;
   right: 14px;
   bottom: 14px;
   z-index: 20;
+}
+
+.whatsapp-float {
+  position: static;
   min-height: 50px;
   padding: 0 16px;
+  border: 0;
   color: #fff;
   background: #20b15a;
   box-shadow: 0 12px 28px rgba(32, 177, 90, 0.32);
+}
+
+.quick-contact-menu {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 10px);
+  width: 172px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: #171b22;
+  box-shadow: var(--shadow);
+}
+
+.quick-contact-menu a {
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 14px;
+  border-bottom: 1px solid var(--line);
+  font-weight: 900;
+}
+
+.quick-contact-menu a:last-child {
+  border-bottom: 0;
+}
+
+.quick-contact-menu i {
+  color: var(--yellow);
 }
 
 .modal {
@@ -442,18 +545,19 @@ button.action-link {
 }
 
 .back-home-btn {
-  min-height: 38px;
+  min-height: 44px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 0 12px;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  color: var(--text);
-  background: var(--card-soft);
+  padding: 0 14px;
+  border: 1px solid rgba(255, 224, 27, 0.34);
+  border-radius: 14px;
+  color: #111;
+  background: var(--yellow);
+  box-shadow: 0 10px 24px rgba(255, 224, 27, 0.14);
   font-size: 0.86rem;
-  font-weight: 800;
+  font-weight: 900;
 }
 
 .steps {
@@ -878,6 +982,37 @@ input[type="range"] {
   background: #1877f2;
 }
 
+.iframe-card {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 940px);
+  height: calc(100dvh - 24px);
+  margin: 0 auto;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 10px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #121419;
+  box-shadow: var(--shadow);
+}
+
+.iframe-card h2 {
+  margin: 0;
+  padding-left: 48px;
+  font-size: 1rem;
+  line-height: 40px;
+}
+
+.iframe-card iframe {
+  width: 100%;
+  height: 100%;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: #fff;
+}
+
 .form-message {
   min-height: 24px;
   margin: 14px 0 0;
@@ -935,6 +1070,15 @@ button:disabled {
 @media (min-width: 560px) {
   .page-shell {
     padding-top: 34px;
+  }
+
+  .hero-brand-row {
+    grid-template-columns: 124px 1fr;
+  }
+
+  .brand-mark {
+    width: 124px;
+    height: 124px;
   }
 
   .download-grid,
