@@ -46,6 +46,8 @@ const governorateOptions = document.getElementById("governorateOptions");
 let currentStep = 1;
 let previewImageUrls = [];
 let previewLogoUrl = "";
+const AGE_MIN = 18;
+const AGE_MAX = 60;
 const PRELOADER_MIN_TIME = 1400;
 const pageStartTime = Date.now();
 
@@ -262,6 +264,7 @@ form.addEventListener("submit", async (event) => {
     updatePreview();
     updatePreviewImage();
     updatePreviewLogo();
+    normalizeAgeRange();
     updateStep();
     showMessage("تم إرسال طلبك بنجاح، سيتواصل معك فريق دال قريبًا.", "success");
   } catch (error) {
@@ -529,12 +532,18 @@ function syncRangeFromNumber(name) {
 
   numberInput.value = value;
   rangeInput.value = value;
+  if (name === "ageFrom" || name === "ageTo") {
+    normalizeAgeRange(name);
+  }
   updateEstimate();
   updatePreview();
 }
 
 function syncNumberFromRange(name) {
   form[name].value = form[`${name}Range`].value;
+  if (name === "ageFrom" || name === "ageTo") {
+    normalizeAgeRange(name);
+  }
   updateEstimate();
   updatePreview();
 }
@@ -543,6 +552,35 @@ function changeStepperValue(name, change) {
   const input = form[name];
   input.value = (Number(input.value) || 0) + change;
   syncRangeFromNumber(name);
+}
+
+function normalizeAgeRange(changedName = "") {
+  let ageFrom = clampNumber(form.ageFrom.value, AGE_MIN, AGE_MAX);
+  let ageTo = clampNumber(form.ageTo.value, AGE_MIN, AGE_MAX);
+
+  if (ageFrom > ageTo) {
+    if (changedName === "ageTo") {
+      ageFrom = ageTo;
+    } else {
+      ageTo = ageFrom;
+    }
+  }
+
+  form.ageFrom.value = ageFrom;
+  form.ageFromRange.value = ageFrom;
+  form.ageTo.value = ageTo;
+  form.ageToRange.value = ageTo;
+
+  form.ageFrom.max = ageTo;
+  form.ageFromRange.max = ageTo;
+  form.ageTo.min = ageFrom;
+  form.ageToRange.min = ageFrom;
+}
+
+function clampNumber(value, min, max) {
+  const number = Number(value);
+  if (Number.isNaN(number)) return min;
+  return Math.min(Math.max(number, min), max);
 }
 
 function buildPayload() {
@@ -603,4 +641,5 @@ function clearMessage() {
 updateEstimate();
 updateGoalFields();
 updatePreview();
+normalizeAgeRange();
 updateStep();
