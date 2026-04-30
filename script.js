@@ -674,7 +674,7 @@ async function buildPayload() {
   const dailyReach = Math.round((days > 0 ? budget / days : 0) * 850);
   const totalReach = dailyReach * days;
   const imageFiles = await filesToBase64(form.adImages.files);
-  const logoFileName = form.companyLogo.files[0]?.name || "";
+  const logoFile = await fileToBase64(form.companyLogo.files[0]);
   const selectedGovernorates = getSelectedGovernorates();
 
   return {
@@ -703,7 +703,7 @@ async function buildPayload() {
     whatsappNumber: form.whatsappNumber.value.trim(),
     destinationUrl: normalizeUrl(form.destinationUrl.value),
     imageFiles,
-    logoFileName,
+    logoFile,
     phone: form.phone.value.trim(),
     contactNumber: form.contactNumber.value.trim(),
     customerName: form.customerName.value.trim()
@@ -726,6 +726,26 @@ function filesToBase64(fileList) {
       reader.readAsDataURL(file);
     });
   }));
+}
+
+function fileToBase64(file) {
+  if (!file) {
+    return Promise.resolve(null);
+  }
+
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = String(reader.result || "");
+      resolve({
+        name: file.name,
+        mimeType: file.type || "application/octet-stream",
+        data: result.includes(",") ? result.split(",")[1] : result
+      });
+    };
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(file);
+  });
 }
 
 function clearSavedFormState() {

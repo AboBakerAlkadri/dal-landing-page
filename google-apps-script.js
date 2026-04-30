@@ -13,6 +13,31 @@
 const CAMPAIGN_SHEET_ID = "1ToD5hxa_6fefZKwxSe2mAO9hSGFb2LAT_fHwr4xN3ig";
 const CAMPAIGN_SHEET_NAME = "Leads";
 const CAMPAIGN_IMAGES_FOLDER_NAME = "DAL Campaign Images";
+const CAMPAIGN_HEADERS = [
+  "التاريخ والوقت",
+  "هدف الإعلان",
+  "الميزانية",
+  "عدد الأيام",
+  "الوصول اليومي",
+  "إجمالي الوصول",
+  "إجمالي التكلفة",
+  "المحافظات المستهدفة",
+  "العمر من",
+  "العمر إلى",
+  "الجنس",
+  "اللغات",
+  "الاهتمامات",
+  "نص المنشور",
+  "الوصف المختصر",
+  "الوصف الطويل",
+  "رقم واتساب",
+  "رابط الموقع",
+  "روابط الصور في Drive",
+  "رابط شعار العميل في Drive",
+  "رقم هاتف المعلن",
+  "رقم الهاتف في الإعلان",
+  "اسم العميل"
+];
 
 const JOBS_SHEET_ID = "PUT_YOUR_JOBS_GOOGLE_SHEET_ID_HERE";
 const JOBS_SHEET_NAME = "Jobs";
@@ -25,6 +50,7 @@ function setupCampaignSheet() {
   }
 
   removeDeprecatedCampaignColumns(sheet);
+  removeHeaderLikeRows(sheet);
   ensureCampaignHeaders(sheet);
 }
 
@@ -65,77 +91,55 @@ function appendCampaignLead(data) {
   }
 
   removeDeprecatedCampaignColumns(sheet);
+  removeHeaderLikeRows(sheet);
   ensureCampaignHeaders(sheet);
   const uploadedImages = saveCampaignImages(data.imageFiles || []);
-  const row = buildCampaignRow(data, uploadedImages);
+  const uploadedLogo = saveCampaignLogo(data.logoFile);
+  const row = buildCampaignRow(data, uploadedImages, uploadedLogo);
 
-  sheet.appendRow(row);
-  formatCampaignSheet(sheet, row.length);
+  sheet.getRange(sheet.getLastRow() + 1, 1, 1, CAMPAIGN_HEADERS.length).setValues([row]);
+  formatCampaignSheet(sheet, CAMPAIGN_HEADERS.length);
 }
 
-function buildCampaignRow(data, uploadedImages) {
-  return [
-    data.submittedAt || new Date().toISOString(),
-    data.campaignGoal || "",
-    data.budget || "",
-    data.days || "",
-    data.dailyReach || "",
-    data.totalReach || "",
-    data.totalCost || "",
-    data.governorates || data.regions || data.governorate || "",
-    data.ageFrom || "",
-    data.ageTo || "",
-    data.gender || "",
-    data.languages || data.language || "",
-    data.interests || "",
-    data.caption || "",
-    data.shortDescription || "",
-    data.longDescription || "",
-    data.whatsappNumber || "",
-    data.destinationUrl || "",
-    uploadedImages.urls,
-    data.logoFileName || "",
-    data.phone || "",
-    data.contactNumber || "",
-    data.customerName || ""
-  ];
+function buildCampaignRow(data, uploadedImages, uploadedLogo) {
+  const rowByHeader = {
+    "التاريخ والوقت": data.submittedAt || new Date().toISOString(),
+    "هدف الإعلان": data.campaignGoal || "",
+    "الميزانية": data.budget || "",
+    "عدد الأيام": data.days || "",
+    "الوصول اليومي": data.dailyReach || "",
+    "إجمالي الوصول": data.totalReach || "",
+    "إجمالي التكلفة": data.totalCost || "",
+    "المحافظات المستهدفة": data.governorates || data.regions || data.governorate || "",
+    "العمر من": data.ageFrom || "",
+    "العمر إلى": data.ageTo || "",
+    "الجنس": data.gender || "",
+    "اللغات": data.languages || data.language || "",
+    "الاهتمامات": data.interests || "",
+    "نص المنشور": data.caption || "",
+    "الوصف المختصر": data.shortDescription || "",
+    "الوصف الطويل": data.longDescription || "",
+    "رقم واتساب": data.whatsappNumber || "",
+    "رابط الموقع": data.destinationUrl || "",
+    "روابط الصور في Drive": uploadedImages.urls,
+    "رابط شعار العميل في Drive": uploadedLogo.url,
+    "رقم هاتف المعلن": data.phone || "",
+    "رقم الهاتف في الإعلان": data.contactNumber || "",
+    "اسم العميل": data.customerName || ""
+  };
+
+  return CAMPAIGN_HEADERS.map((header) => rowByHeader[header] || "");
 }
 
 function ensureCampaignHeaders(sheet) {
-  const headers = [
-    "التاريخ والوقت",
-    "هدف الإعلان",
-    "الميزانية",
-    "عدد الأيام",
-    "الوصول اليومي",
-    "إجمالي الوصول",
-    "إجمالي التكلفة",
-    "المحافظات المستهدفة",
-    "العمر من",
-    "العمر إلى",
-    "الجنس",
-    "اللغات",
-    "الاهتمامات",
-    "نص المنشور",
-    "الوصف المختصر",
-    "الوصف الطويل",
-    "رقم واتساب",
-    "رابط الموقع",
-    "روابط الصور في Drive",
-    "اسم ملف الشعار",
-    "رقم هاتف المعلن",
-    "رقم الهاتف في الإعلان",
-    "اسم العميل"
-  ];
-
   if (sheet.getLastRow() === 0) {
     sheet.insertRowBefore(1);
   }
 
-  sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+  sheet.getRange(1, 1, 1, CAMPAIGN_HEADERS.length).setValues([CAMPAIGN_HEADERS]);
   sheet.setFrozenRows(1);
 
-  formatCampaignSheet(sheet, headers.length);
+  formatCampaignSheet(sheet, CAMPAIGN_HEADERS.length);
 }
 
 function removeDeprecatedCampaignColumns(sheet) {
@@ -148,7 +152,8 @@ function removeDeprecatedCampaignColumns(sheet) {
     "المحافظات",
     "المناطق",
     "أسماء الصور المختارة",
-    "أسماء الصور المحفوظة"
+    "أسماء الصور المحفوظة",
+    "اسم ملف الشعار"
   ];
   const lastColumn = sheet.getLastColumn();
 
@@ -161,6 +166,36 @@ function removeDeprecatedCampaignColumns(sheet) {
   for (let index = headers.length - 1; index >= 0; index -= 1) {
     if (deprecatedHeaders.includes(headers[index])) {
       sheet.deleteColumn(index + 1);
+    }
+  }
+}
+
+function removeHeaderLikeRows(sheet) {
+  const lastRow = sheet.getLastRow();
+  const lastColumn = sheet.getLastColumn();
+
+  if (lastRow <= 1 || !lastColumn) {
+    return;
+  }
+
+  const rows = sheet.getRange(2, 1, lastRow - 1, lastColumn).getValues();
+  const headerWords = new Set(CAMPAIGN_HEADERS.concat([
+    "نوع النموذج",
+    "كود الهدف",
+    "المدينة",
+    "المحافظة",
+    "المحافظات",
+    "المناطق",
+    "اسم ملف الشعار",
+    "أسماء الصور المحفوظة"
+  ]));
+
+  for (let index = rows.length - 1; index >= 0; index -= 1) {
+    const filledCells = rows[index].filter((cell) => String(cell).trim());
+    const matchingHeaders = filledCells.filter((cell) => headerWords.has(String(cell).trim()));
+
+    if (filledCells.length && matchingHeaders.length >= Math.min(3, filledCells.length)) {
+      sheet.deleteRow(index + 2);
     }
   }
 }
@@ -223,6 +258,24 @@ function saveCampaignImages(imageFiles) {
   return {
     names: savedFiles.map((file) => file.name).join(", "),
     urls: savedFiles.map((file) => file.url).join(", ")
+  };
+}
+
+function saveCampaignLogo(logoFile) {
+  if (!logoFile || !logoFile.data) {
+    return {
+      url: ""
+    };
+  }
+
+  const folder = getOrCreateFolder(CAMPAIGN_IMAGES_FOLDER_NAME);
+  const bytes = Utilities.base64Decode(logoFile.data);
+  const blob = Utilities.newBlob(bytes, logoFile.mimeType, logoFile.name);
+  const savedFile = folder.createFile(blob);
+  savedFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+
+  return {
+    url: savedFile.getUrl()
   };
 }
 
