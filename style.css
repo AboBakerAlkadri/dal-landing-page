@@ -680,9 +680,32 @@ textarea:focus {
   border: 0;
   border-radius: 9px;
   padding: 0 14px;
+  font-weight: 800;
+}
+
+.carousel-card-body button[data-goal-tone="default"] {
+  color: #65676b;
+  background: #e4e6eb;
+}
+
+.carousel-card-body button[data-goal-tone="awareness"] {
   color: #1c1e21;
   background: #e4e6eb;
-  font-weight: 800;
+}
+
+.carousel-card-body button[data-goal-tone="engagement"] {
+  color: #050505;
+  background: #f0f2f5;
+}
+
+.carousel-card-body button[data-goal-tone="messages"] {
+  color: #1877f2;
+  background: #e7f3ff;
+}
+
+.carousel-card-body button[data-goal-tone="traffic"] {
+  color: #fff;
+  background: #1877f2;
 }
 
 .preview-stats {
@@ -723,9 +746,34 @@ textarea:focus {
   width: 100%;
   min-height: 46px;
   border: 0;
-  color: #111;
-  background: var(--yellow);
+  border-top: 1px solid #ced0d4;
   font-weight: 800;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.message-preview-btn[data-goal-tone="default"] {
+  color: #65676b;
+  background: #f0f2f5;
+}
+
+.message-preview-btn[data-goal-tone="awareness"] {
+  color: #1c1e21;
+  background: #f0f2f5;
+}
+
+.message-preview-btn[data-goal-tone="engagement"] {
+  color: #050505;
+  background: #ffffff;
+}
+
+.message-preview-btn[data-goal-tone="messages"] {
+  color: #1877f2;
+  background: #e7f3ff;
+}
+
+.message-preview-btn[data-goal-tone="traffic"] {
+  color: #fff;
+  background: #1877f2;
 }
 
 .form-message {

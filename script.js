@@ -58,6 +58,25 @@ const SYRIA_LOCATIONS = {
   "الحسكة": ["الحسكة", "القامشلي", "المالكية", "رأس العين", "عامودا", "الدرباسية"]
 };
 
+const GOAL_PREVIEW_CONFIG = {
+  "الوعي والانتشار CPM": {
+    cta: "معرفة المزيد",
+    tone: "awareness"
+  },
+  "التفاعل والمشاركات": {
+    cta: "زيارة الملف الشخصي",
+    tone: "engagement"
+  },
+  "تلقي رسائل واتساب/ماسنجر": {
+    cta: "إرسال رسالة",
+    tone: "messages"
+  },
+  "زيارات الموقع والتطبيق": {
+    cta: "زيارة الرابط",
+    tone: "traffic"
+  }
+};
+
 window.addEventListener("load", () => {
   const preloader = document.getElementById("preloader");
   if (!preloader) return;
@@ -91,6 +110,7 @@ openCampaign.addEventListener("click", () => {
   modal.classList.add("is-open");
   modal.setAttribute("aria-hidden", "false");
   document.body.style.overflow = "hidden";
+  updateGoalFields();
 });
 
 closeModalButtons.forEach((button) => {
@@ -136,6 +156,7 @@ prevStepButton.addEventListener("click", () => {
 
 form.addEventListener("input", () => {
   updateEstimate();
+  updateGoalFields();
   updatePreview();
 });
 
@@ -249,7 +270,9 @@ function updatePreview() {
   previewText.textContent = caption || "سيظهر نص الإعلان هنا أثناء الكتابة.";
   previewShort.textContent = shortDescription || "وصف مختصر للحملة";
   previewLong.textContent = longDescription || "تفاصيل الإعلان تظهر هنا بشكل مشابه لإعلانات فيسبوك.";
-  previewCta.textContent = getPreviewCtaText(form.campaignGoal.value);
+  const goalPreview = getGoalPreviewConfig(form.campaignGoal.value);
+  previewCta.textContent = goalPreview.cta;
+  previewCta.dataset.goalTone = goalPreview.tone;
 
   if (previewImageUrls.length) {
     renderPreviewCarousel();
@@ -272,15 +295,11 @@ function updateGoalFields() {
   updatePreview();
 }
 
-function getPreviewCtaText(goal) {
-  const ctaMap = {
-    "الوعي والانتشار CPM": "معرفة المزيد",
-    "التفاعل والمشاركات": "زيارة الملف الشخصي",
-    "تلقي رسائل واتساب/ماسنجر": "إرسال رسالة",
-    "زيارات الموقع والتطبيق": "زيارة الرابط"
+function getGoalPreviewConfig(goal) {
+  return GOAL_PREVIEW_CONFIG[goal] || {
+    cta: "اختر هدف الحملة",
+    tone: "default"
   };
-
-  return ctaMap[goal] || "إرسال رسالة";
 }
 
 function updatePreviewImage() {
@@ -323,7 +342,9 @@ function renderPreviewCarousel() {
 
     const button = document.createElement("button");
     button.type = "button";
-    button.textContent = getPreviewCtaText(form.campaignGoal.value);
+    const goalPreview = getGoalPreviewConfig(form.campaignGoal.value);
+    button.textContent = goalPreview.cta;
+    button.dataset.goalTone = goalPreview.tone;
 
     body.append(title, price, button);
     card.append(image, body);
@@ -404,5 +425,6 @@ function clearMessage() {
 }
 
 updateEstimate();
+updateGoalFields();
 updatePreview();
 updateStep();
