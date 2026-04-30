@@ -32,14 +32,9 @@ const previewText = document.getElementById("previewText");
 const previewShort = document.getElementById("previewShort");
 const previewLong = document.getElementById("previewLong");
 const previewImage = document.getElementById("previewImage");
-const carouselControls = document.getElementById("carouselControls");
-const prevImageButton = document.getElementById("prevImage");
-const nextImageButton = document.getElementById("nextImage");
-const imageCounter = document.getElementById("imageCounter");
 
 let currentStep = 1;
 let previewImageUrls = [];
-let currentImageIndex = 0;
 const PRELOADER_MIN_TIME = 1400;
 const pageStartTime = Date.now();
 
@@ -143,8 +138,6 @@ form.addEventListener("input", () => {
 
 form.governorate.addEventListener("change", updateCities);
 form.adImages.addEventListener("change", updatePreviewImage);
-prevImageButton.addEventListener("click", () => showPreviewImage(currentImageIndex - 1));
-nextImageButton.addEventListener("click", () => showPreviewImage(currentImageIndex + 1));
 
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
@@ -252,33 +245,60 @@ function updatePreview() {
   previewText.textContent = caption || "سيظهر نص الإعلان هنا أثناء الكتابة.";
   previewShort.textContent = shortDescription || "وصف مختصر للحملة";
   previewLong.textContent = longDescription || "تفاصيل الإعلان تظهر هنا بشكل مشابه لإعلانات فيسبوك.";
+
+  if (previewImageUrls.length) {
+    renderPreviewCarousel();
+  }
 }
 
 function updatePreviewImage() {
   previewImageUrls.forEach((url) => URL.revokeObjectURL(url));
-  previewImageUrls = Array.from(form.adImages.files).map((file) => URL.createObjectURL(file));
-  currentImageIndex = 0;
-  showPreviewImage(0);
+  previewImageUrls = Array.from(form.adImages.files).map((file, index) => ({
+    url: URL.createObjectURL(file),
+    name: file.name,
+    index
+  }));
+  renderPreviewCarousel();
 }
 
-function showPreviewImage(index) {
+function renderPreviewCarousel() {
   previewImage.innerHTML = "";
 
   if (!previewImageUrls.length) {
     previewImage.innerHTML = '<i class="fa-regular fa-image" aria-hidden="true"></i>';
-    carouselControls.hidden = true;
     return;
   }
 
-  currentImageIndex = (index + previewImageUrls.length) % previewImageUrls.length;
+  const carousel = document.createElement("div");
+  carousel.className = "facebook-carousel";
 
-  const image = document.createElement("img");
-  image.src = previewImageUrls[currentImageIndex];
-  image.alt = `معاينة صورة الإعلان ${currentImageIndex + 1}`;
-  previewImage.appendChild(image);
+  previewImageUrls.forEach((item) => {
+    const card = document.createElement("article");
+    card.className = "carousel-card";
 
-  carouselControls.hidden = previewImageUrls.length < 2;
-  imageCounter.textContent = `${currentImageIndex + 1} / ${previewImageUrls.length}`;
+    const image = document.createElement("img");
+    image.src = item.url;
+    image.alt = `معاينة صورة الإعلان ${item.index + 1}`;
+
+    const body = document.createElement("div");
+    body.className = "carousel-card-body";
+
+    const title = document.createElement("strong");
+    title.textContent = form.shortDescription.value.trim() || `صورة الإعلان ${item.index + 1}`;
+
+    const price = document.createElement("span");
+    price.textContent = form.budget.value ? `${form.budget.value}$` : "ميزانية الحملة";
+
+    const button = document.createElement("button");
+    button.type = "button";
+    button.textContent = "عرض التفاصيل";
+
+    body.append(title, price, button);
+    card.append(image, body);
+    carousel.appendChild(card);
+  });
+
+  previewImage.appendChild(carousel);
 }
 
 function populateGovernorates() {
