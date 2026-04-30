@@ -120,9 +120,11 @@ document.querySelectorAll("[data-link]").forEach((element) => {
 
 populateGovernorates();
 
-openCampaign.addEventListener("click", () => {
-  openCampaignModal();
-});
+if (openCampaign) {
+  openCampaign.addEventListener("click", () => {
+    openCampaignModal();
+  });
+}
 
 openCampaignBanner.addEventListener("click", openCampaignModal);
 

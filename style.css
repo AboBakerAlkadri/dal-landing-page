@@ -115,6 +115,18 @@ button {
   text-align: right;
 }
 
+.hero-text {
+  transform: translateY(7px);
+}
+
+.hero-text h1 {
+  margin-bottom: 10px;
+}
+
+.hero-text p:last-child {
+  margin-bottom: 0;
+}
+
 .brand-mark {
   width: 98px;
   height: 98px;
@@ -224,9 +236,19 @@ h1 {
 
 .store-btn {
   width: 100%;
+  min-width: 0;
   padding: 0 14px;
   border: 1px solid var(--line);
   background: var(--card-soft);
+}
+
+.store-btn span {
+  min-width: 0;
+}
+
+.store-btn--nowrap span {
+  white-space: nowrap;
+  font-size: clamp(0.82rem, 3.6vw, 1rem);
 }
 
 .store-btn--wide {
@@ -263,24 +285,52 @@ h1 {
   min-height: 58px;
   border: 0;
   border-radius: 18px;
-  color: #111;
-  background: linear-gradient(180deg, #fff06a, var(--yellow) 58%, #e5bd00);
-  box-shadow: 0 0 0 rgba(255, 224, 27, 0);
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 2px 10px;
+  padding: 10px 16px;
+  color: #090a0c;
+  background: linear-gradient(180deg, #fff7a1 0%, #ffe01b 45%, #ffc400 100%);
+  box-shadow: 0 0 16px rgba(255, 224, 27, 0.28), 0 18px 34px rgba(255, 224, 27, 0.26);
   font-weight: 900;
   font-size: 1.02rem;
   animation: glowPulse 1.55s ease-in-out infinite;
 }
 
+.campaign-glow i {
+  grid-row: 1 / span 2;
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--yellow);
+  background: #101216;
+  font-size: 1.12rem;
+}
+
+.campaign-glow span,
+.campaign-glow small {
+  text-align: right;
+}
+
+.campaign-glow small {
+  font-size: 0.78rem;
+  font-weight: 900;
+  color: rgba(9, 10, 12, 0.72);
+}
+
 @keyframes glowPulse {
   0%,
   100% {
-    box-shadow: 0 0 0 rgba(255, 224, 27, 0.16), 0 14px 28px rgba(255, 224, 27, 0.18);
+    box-shadow: 0 0 14px rgba(255, 224, 27, 0.3), 0 14px 28px rgba(255, 224, 27, 0.22);
     filter: brightness(0.98);
   }
 
   50% {
-    box-shadow: 0 0 22px rgba(255, 224, 27, 0.58), 0 18px 38px rgba(255, 224, 27, 0.3);
-    filter: brightness(1.08);
+    box-shadow: 0 0 34px rgba(255, 224, 27, 0.78), 0 20px 46px rgba(255, 224, 27, 0.38);
+    filter: brightness(1.13);
   }
 }
 
@@ -1091,14 +1141,7 @@ button:disabled {
   }
 
   .links-layout {
-    grid-template-columns: 128px 1fr;
-    align-items: stretch;
-  }
-
-  .vertical-slide {
-    min-height: 100%;
-    text-align: center;
-    justify-items: center;
+    grid-template-columns: 1fr;
   }
 
   .estimate-card {
