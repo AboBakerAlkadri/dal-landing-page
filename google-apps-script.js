@@ -70,6 +70,7 @@ function appendCampaignLead(data) {
   const row = buildCampaignRow(data, uploadedImages);
 
   sheet.appendRow(row);
+  formatCampaignSheet(sheet, row.length);
 }
 
 function buildCampaignRow(data, uploadedImages) {
@@ -190,6 +191,9 @@ function formatCampaignSheet(sheet, headersCount) {
       .setBackground("#ffffff")
       .setHorizontalAlignment("center")
       .setVerticalAlignment("middle");
+
+    sheet.getRange(2, 3, lastRow - 1, 1).setNumberFormat("$#,##0");
+    sheet.getRange(2, 7, lastRow - 1, 1).setNumberFormat("$#,##0");
   }
 
   sheet.autoResizeColumns(1, headersCount);

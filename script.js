@@ -116,7 +116,7 @@ document.querySelectorAll("[data-link]").forEach((element) => {
     if (LINKS[key].startsWith("http") && !element.hasAttribute("data-direct-link")) {
       element.addEventListener("click", (event) => {
         event.preventDefault();
-        openIframe(LINKS[key], element.textContent.trim() || "تطبيق دال");
+        openIframe(LINKS[key], element.textContent.trim() || "Dal Syria");
       });
     }
   }
@@ -176,7 +176,7 @@ function closeModal() {
 }
 
 function openIframe(url, title) {
-  iframeTitle.textContent = title || "تطبيق دال";
+  iframeTitle.textContent = title || "Dal Syria";
   linkFrame.src = url;
   iframeModal.classList.add("is-open");
   iframeModal.setAttribute("aria-hidden", "false");
@@ -261,8 +261,10 @@ form.addEventListener("submit", async (event) => {
   }
 
   submitButton.disabled = true;
-  submitButton.textContent = "جارٍ الإرسال...";
   clearMessage();
+  submitButton.classList.add("is-loading");
+  submitButton.textContent = "جارٍ إرسال الطلب...";
+  showMessage("جارٍ إرسال الطلب، يرجى عدم إغلاق الصفحة.", "loading");
 
   try {
     const payload = await buildPayload();
@@ -298,6 +300,7 @@ form.addEventListener("submit", async (event) => {
     showMessage(`حدث خطأ أثناء الإرسال، يرجى المحاولة مرة أخرى. ${error.message || ""}`, "error");
   } finally {
     submitButton.disabled = false;
+    submitButton.classList.remove("is-loading");
     submitButton.textContent = "إرسال الطلب";
   }
 });
@@ -390,12 +393,29 @@ function isValidPhoneNumber(value) {
 }
 
 function isValidUrl(value) {
+  const normalizedValue = normalizeUrl(value);
+
   try {
-    const url = new URL(value.trim());
+    const url = new URL(normalizedValue);
     return url.protocol === "https:" || url.protocol === "http:";
   } catch (error) {
     return false;
   }
+}
+
+function normalizeUrl(value) {
+  const trimmedValue = value.trim();
+  if (!trimmedValue) return "";
+
+  if (/^https?:\/\//i.test(trimmedValue)) {
+    return trimmedValue;
+  }
+
+  if (/^www\./i.test(trimmedValue)) {
+    return `https://${trimmedValue}`;
+  }
+
+  return trimmedValue;
 }
 
 function updateEstimate() {
@@ -676,7 +696,7 @@ async function buildPayload() {
     shortDescription: form.shortDescription.value.trim(),
     longDescription: form.longDescription.value.trim(),
     whatsappNumber: form.whatsappNumber.value.trim(),
-    destinationUrl: form.destinationUrl.value.trim(),
+    destinationUrl: normalizeUrl(form.destinationUrl.value),
     imageFiles,
     logoFileName,
     phone: form.phone.value.trim(),
