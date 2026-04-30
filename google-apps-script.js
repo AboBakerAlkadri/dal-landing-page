@@ -27,6 +27,11 @@ function setupCampaignSheet() {
   ensureCampaignHeaders(sheet);
 }
 
+function authorizeDriveAccess() {
+  const folder = getOrCreateFolder(CAMPAIGN_IMAGES_FOLDER_NAME);
+  return folder.getUrl();
+}
+
 function doPost(e) {
   try {
     const data = JSON.parse(e.postData.contents);

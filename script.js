@@ -276,7 +276,7 @@ form.addEventListener("submit", async (event) => {
 
     const result = await response.json();
     if (!response.ok || !result.success) {
-      throw new Error("Send failed");
+      throw new Error(result.message || "Send failed");
     }
 
     form.reset();
@@ -294,7 +294,7 @@ form.addEventListener("submit", async (event) => {
     alert("تم إرسال طلبك بنجاح، سيتواصل معك فريق دال قريبًا.");
     showMessage("تم إرسال طلبك بنجاح، سيتواصل معك فريق دال قريبًا.", "success");
   } catch (error) {
-    showMessage("حدث خطأ أثناء الإرسال، يرجى المحاولة مرة أخرى.", "error");
+    showMessage(`حدث خطأ أثناء الإرسال، يرجى المحاولة مرة أخرى. ${error.message || ""}`, "error");
   } finally {
     submitButton.disabled = false;
     submitButton.textContent = "إرسال الطلب";
