@@ -34,8 +34,6 @@ const previewLong = document.getElementById("previewLong");
 const previewImage = document.getElementById("previewImage");
 const previewCta = document.getElementById("previewCta");
 const previewLogo = document.getElementById("previewLogo");
-const whatsappGoalField = document.getElementById("whatsappGoalField");
-const destinationGoalField = document.getElementById("destinationGoalField");
 const governorateOptions = document.getElementById("governorateOptions");
 
 let currentStep = 1;
@@ -62,7 +60,7 @@ const SYRIA_LOCATIONS = {
 };
 
 const GOAL_PREVIEW_CONFIG = {
-  awareness: {
+  reach: {
     cta: "Learn More",
     tone: "awareness"
   },
@@ -71,8 +69,12 @@ const GOAL_PREVIEW_CONFIG = {
     tone: "engagement"
   },
   messages: {
-    cta: "Send WhatsApp Message",
+    cta: "Send Message",
     tone: "messages"
+  },
+  calls: {
+    cta: "Call Now",
+    tone: "calls"
   },
   traffic: {
     cta: "Visit Website",
@@ -242,19 +244,6 @@ function validateCurrentStep() {
   }
 
   if (currentStep === 1) {
-    const goalType = getSelectedGoalType();
-
-    if (goalType === "messages" && !isValidPhoneNumber(form.whatsappNumber.value)) {
-      showMessage("يرجى إدخال رقم واتساب صحيح مع رمز الدولة، مثال: 963939769472.", "error");
-      form.whatsappNumber.focus();
-      return false;
-    }
-
-    if (goalType === "traffic" && !isValidUrl(form.destinationUrl.value)) {
-      showMessage("يرجى إدخال رابط صحيح يبدأ بـ https:// أو http://.", "error");
-      form.destinationUrl.focus();
-      return false;
-    }
   }
 
   const ageFrom = Number(form.ageFrom.value);
@@ -275,6 +264,32 @@ function validateCurrentStep() {
     if (ageFrom > ageTo) {
       showMessage("العمر من يجب أن يكون أقل من أو يساوي العمر إلى.", "error");
       form.ageFrom.focus();
+      return false;
+    }
+  }
+
+  if (currentStep === 3) {
+    if (form.phone.value.trim() && !isValidPhoneNumber(form.phone.value)) {
+      showMessage("يرجى إدخال رقم هاتف صحيح.", "error");
+      form.phone.focus();
+      return false;
+    }
+
+    if (form.whatsappNumber.value.trim() && !isValidPhoneNumber(form.whatsappNumber.value)) {
+      showMessage("يرجى إدخال رقم واتساب صحيح مع رمز الدولة، مثال: 963939769472.", "error");
+      form.whatsappNumber.focus();
+      return false;
+    }
+
+    if (form.contactNumber.value.trim() && !isValidPhoneNumber(form.contactNumber.value)) {
+      showMessage("يرجى إدخال رقم تواصل مباشر صحيح.", "error");
+      form.contactNumber.focus();
+      return false;
+    }
+
+    if (form.destinationUrl.value.trim() && !isValidUrl(form.destinationUrl.value)) {
+      showMessage("يرجى إدخال رابط صحيح يبدأ بـ https:// أو http://.", "error");
+      form.destinationUrl.focus();
       return false;
     }
   }
@@ -337,18 +352,7 @@ function updatePreview() {
 }
 
 function updateGoalFields() {
-  const goalType = getSelectedGoalType();
-  const needsWhatsapp = goalType === "messages";
-  const needsDestination = goalType === "traffic";
   const goalPreview = getGoalPreviewConfig();
-
-  whatsappGoalField.hidden = !needsWhatsapp;
-  destinationGoalField.hidden = !needsDestination;
-  form.whatsappNumber.required = needsWhatsapp;
-  form.destinationUrl.required = needsDestination;
-
-  if (!needsWhatsapp) form.whatsappNumber.value = "";
-  if (!needsDestination) form.destinationUrl.value = "";
 
   previewCta.textContent = goalPreview.cta;
   previewCta.dataset.goalTone = goalPreview.tone;
@@ -544,6 +548,7 @@ function buildPayload() {
     imageFileName: fileNames,
     logoFileName,
     phone: form.phone.value.trim(),
+    contactNumber: form.contactNumber.value.trim(),
     customerName: form.customerName.value.trim()
   };
 }

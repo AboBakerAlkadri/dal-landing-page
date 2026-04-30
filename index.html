@@ -13,7 +13,7 @@
   <link rel="icon" href="dal-icon.jpg">
   <link rel="preconnect" href="https://cdnjs.cloudflare.com">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <link rel="stylesheet" href="style.css?v=20260430-audience-budget-logo">
+  <link rel="stylesheet" href="style.css?v=20260430-final-goals-interests">
 </head>
 <body>
   <div class="preloader" id="preloader" aria-label="جارٍ تحميل الصفحة">
@@ -159,24 +159,13 @@
             الهدف من الإعلان
             <select name="campaignGoal" id="campaignGoal" required onchange="handleCampaignGoalChange()">
               <option value="">اختر الهدف</option>
-              <option value="awareness" data-label="الوعي والانتشار CPM">الوعي والانتشار CPM</option>
-              <option value="engagement" data-label="التفاعل والمشاركات">التفاعل والمشاركات</option>
-              <option value="messages" data-label="تلقي رسائل واتساب/ماسنجر">تلقي رسائل واتساب/ماسنجر</option>
-              <option value="traffic" data-label="زيارات الموقع والتطبيق">زيارات الموقع والتطبيق</option>
+              <option value="reach" data-label="مشاهدات ووصول">مشاهدات ووصول</option>
+              <option value="engagement" data-label="تفاعل مع الفيديو والمنشور">تفاعل مع الفيديو والمنشور</option>
+              <option value="messages" data-label="تلقي رسائل">تلقي رسائل</option>
+              <option value="calls" data-label="تلقي مكالمات">تلقي مكالمات</option>
+              <option value="traffic" data-label="زيارة موقع إلكتروني">زيارة موقع إلكتروني</option>
             </select>
           </label>
-          <div class="goal-extra-field" id="whatsappGoalField" hidden>
-            <label>
-              رقم واتساب لاستقبال الرسائل
-              <input type="tel" name="whatsappNumber" placeholder="مثال: 963939769472">
-            </label>
-          </div>
-          <div class="goal-extra-field" id="destinationGoalField" hidden>
-            <label>
-              رابط الموقع أو التطبيق
-              <input type="url" name="destinationUrl" placeholder="https://example.com">
-            </label>
-          </div>
           <div class="two-cols">
             <label>
               الميزانية بالدولار
@@ -252,8 +241,37 @@
             </select>
           </label>
           <label>
-            الاهتمامات اختياري
-            <input type="text" name="interests" placeholder="سيارات، عقارات، تسوق، تكنولوجيا">
+            الاهتمامات
+            <select name="interests" required>
+              <option value="">اختر الاهتمام</option>
+              <option value="العقارات">العقارات</option>
+              <option value="الأراضي">الأراضي</option>
+              <option value="الشقق السكنية">الشقق السكنية</option>
+              <option value="المركبات">المركبات</option>
+              <option value="السيارات">السيارات</option>
+              <option value="الدراجات النارية">الدراجات النارية</option>
+              <option value="الإلكترونيات">الإلكترونيات</option>
+              <option value="الموبايلات">الموبايلات</option>
+              <option value="الكمبيوتر واللابتوب">الكمبيوتر واللابتوب</option>
+              <option value="الأثاث والمفروشات">الأثاث والمفروشات</option>
+              <option value="الأجهزة المنزلية">الأجهزة المنزلية</option>
+              <option value="الأزياء والموضة">الأزياء والموضة</option>
+              <option value="التسوق">التسوق</option>
+              <option value="الوظائف">الوظائف</option>
+              <option value="الخدمات">الخدمات</option>
+              <option value="المطاعم والمقاهي">المطاعم والمقاهي</option>
+              <option value="السياحة والسفر">السياحة والسفر</option>
+              <option value="التعليم والدورات">التعليم والدورات</option>
+              <option value="الصحة والجمال">الصحة والجمال</option>
+              <option value="الرياضة واللياقة">الرياضة واللياقة</option>
+              <option value="الأطفال والعائلة">الأطفال والعائلة</option>
+              <option value="الحيوانات الأليفة">الحيوانات الأليفة</option>
+              <option value="الزراعة">الزراعة</option>
+              <option value="الصناعة والمعدات">الصناعة والمعدات</option>
+              <option value="التكنولوجيا">التكنولوجيا</option>
+              <option value="الألعاب والترفيه">الألعاب والترفيه</option>
+              <option value="غير ذلك">غير ذلك</option>
+            </select>
           </label>
         </div>
 
@@ -270,6 +288,18 @@
           <label>
             رقم الهاتف اختياري
             <input type="tel" name="phone" placeholder="09xxxxxxxx">
+          </label>
+          <label>
+            رقم واتساب للتواصل
+            <input type="tel" name="whatsappNumber" placeholder="مثال: 963939769472">
+          </label>
+          <label>
+            رقم تواصل مباشر
+            <input type="tel" name="contactNumber" placeholder="مثال: 0939769472">
+          </label>
+          <label>
+            رابط الموقع الإلكتروني اختياري
+            <input type="url" name="destinationUrl" placeholder="https://example.com">
           </label>
           <label>
             نص المنشور Caption
@@ -333,6 +363,6 @@
     تواصل معنا
   </a>
 
-  <script src="script.js?v=20260430-audience-budget-logo"></script>
+  <script src="script.js?v=20260430-final-goals-interests"></script>
 </body>
 </html>

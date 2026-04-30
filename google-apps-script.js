@@ -50,6 +50,7 @@ function doPost(e) {
       data.imageFileName || "",
       data.logoFileName || "",
       data.phone || "",
+      data.contactNumber || "",
       data.customerName || ""
     ]);
 

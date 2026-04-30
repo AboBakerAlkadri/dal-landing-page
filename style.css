@@ -792,6 +792,11 @@ input[type="range"] {
   background: #25d366;
 }
 
+.carousel-card-body button[data-goal-tone="calls"] {
+  color: #fff;
+  background: #16a34a;
+}
+
 .carousel-card-body button[data-goal-tone="traffic"] {
   color: #fff;
   background: #1877f2;
@@ -861,6 +866,11 @@ input[type="range"] {
 .message-preview-btn[data-goal-tone="messages"] {
   color: #fff;
   background: #25d366;
+}
+
+.message-preview-btn[data-goal-tone="calls"] {
+  color: #fff;
+  background: #16a34a;
 }
 
 .message-preview-btn[data-goal-tone="traffic"] {
