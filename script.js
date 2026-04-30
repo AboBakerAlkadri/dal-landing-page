@@ -151,6 +151,13 @@ quickContactToggle.addEventListener("click", () => {
   quickContactMenu.hidden = !quickContactMenu.hidden;
 });
 
+window.addEventListener("scroll", hideQuickContactMenu, { passive: true });
+document.addEventListener("touchstart", (event) => {
+  if (!event.target.closest("#quickContact")) {
+    hideQuickContactMenu();
+  }
+}, { passive: true });
+
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape" && modal.classList.contains("is-open")) {
     closeModal();
@@ -176,6 +183,10 @@ function closeIframe() {
   iframeModal.setAttribute("aria-hidden", "true");
   linkFrame.src = "about:blank";
   document.body.style.overflow = modal.classList.contains("is-open") ? "hidden" : "";
+}
+
+function hideQuickContactMenu() {
+  quickContactMenu.hidden = true;
 }
 
 function updateStep() {
