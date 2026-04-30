@@ -164,6 +164,10 @@ form.campaignGoal.addEventListener("change", updateGoalFields);
 form.governorate.addEventListener("change", updateCities);
 form.adImages.addEventListener("change", updatePreviewImage);
 
+window.handleCampaignGoalChange = function handleCampaignGoalChange() {
+  updateGoalFields();
+};
+
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
   if (!validateCurrentStep()) return;
@@ -316,6 +320,7 @@ function updateGoalFields() {
   const goalType = getSelectedGoalType();
   const needsWhatsapp = goalType === "messages";
   const needsDestination = goalType === "traffic";
+  const goalPreview = getGoalPreviewConfig();
 
   whatsappGoalField.hidden = !needsWhatsapp;
   destinationGoalField.hidden = !needsDestination;
@@ -325,7 +330,12 @@ function updateGoalFields() {
   if (!needsWhatsapp) form.whatsappNumber.value = "";
   if (!needsDestination) form.destinationUrl.value = "";
 
-  updatePreview();
+  previewCta.textContent = goalPreview.cta;
+  previewCta.dataset.goalTone = goalPreview.tone;
+
+  if (previewImageUrls.length) {
+    renderPreviewCarousel();
+  }
 }
 
 function getGoalPreviewConfig() {

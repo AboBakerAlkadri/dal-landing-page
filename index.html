@@ -13,7 +13,7 @@
   <link rel="icon" href="dal-icon.jpg">
   <link rel="preconnect" href="https://cdnjs.cloudflare.com">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=20260430-cta-language-fix">
 </head>
 <body>
   <div class="preloader" id="preloader" aria-label="جارٍ تحميل الصفحة">
@@ -153,7 +153,7 @@
           <h3>معلومات الحملة</h3>
           <label>
             الهدف من الإعلان
-            <select name="campaignGoal" required>
+            <select name="campaignGoal" id="campaignGoal" required onchange="handleCampaignGoalChange()">
               <option value="">اختر الهدف</option>
               <option value="awareness" data-label="الوعي والانتشار CPM">الوعي والانتشار CPM</option>
               <option value="engagement" data-label="التفاعل والمشاركات">التفاعل والمشاركات</option>
@@ -227,7 +227,7 @@
           </label>
           <label>
             اللغة
-            <select name="language" required>
+            <select name="language" id="language" required>
               <option value="">اختر اللغة</option>
               <option value="العربية">العربية</option>
               <option value="الإنجليزية">الإنجليزية</option>
@@ -317,6 +317,6 @@
     تواصل معنا
   </a>
 
-  <script src="script.js"></script>
+  <script src="script.js?v=20260430-cta-language-fix"></script>
 </body>
 </html>
