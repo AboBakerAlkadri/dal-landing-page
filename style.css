@@ -511,16 +511,6 @@ textarea {
   outline: none;
 }
 
-select[multiple] {
-  min-height: 112px;
-  padding: 8px;
-}
-
-select[multiple] option {
-  padding: 8px;
-  border-radius: 10px;
-}
-
 textarea {
   resize: vertical;
   line-height: 1.7;

@@ -155,10 +155,10 @@
             الهدف من الإعلان
             <select name="campaignGoal" required>
               <option value="">اختر الهدف</option>
-              <option value="الوعي والانتشار CPM" data-goal="awareness">الوعي والانتشار CPM</option>
-              <option value="التفاعل والمشاركات" data-goal="engagement">التفاعل والمشاركات</option>
-              <option value="تلقي رسائل واتساب/ماسنجر" data-goal="messages">تلقي رسائل واتساب/ماسنجر</option>
-              <option value="زيارات الموقع والتطبيق" data-goal="traffic">زيارات الموقع والتطبيق</option>
+              <option value="awareness" data-label="الوعي والانتشار CPM">الوعي والانتشار CPM</option>
+              <option value="engagement" data-label="التفاعل والمشاركات">التفاعل والمشاركات</option>
+              <option value="messages" data-label="تلقي رسائل واتساب/ماسنجر">تلقي رسائل واتساب/ماسنجر</option>
+              <option value="traffic" data-label="زيارات الموقع والتطبيق">زيارات الموقع والتطبيق</option>
             </select>
           </label>
           <div class="goal-extra-field" id="whatsappGoalField" hidden>
@@ -226,12 +226,17 @@
             </select>
           </label>
           <label>
-            اللغات
-            <select name="languages" multiple size="4" required>
-              <option value="العربية" selected>العربية</option>
+            اللغة
+            <select name="language" required>
+              <option value="">اختر اللغة</option>
+              <option value="العربية">العربية</option>
               <option value="الإنجليزية">الإنجليزية</option>
-              <option value="الكردية">الكردية</option>
               <option value="التركية">التركية</option>
+              <option value="الفرنسية">الفرنسية</option>
+              <option value="الألمانية">الألمانية</option>
+              <option value="الصينية">الصينية</option>
+              <option value="الروسية">الروسية</option>
+              <option value="الكردية">الكردية</option>
             </select>
           </label>
           <label>
@@ -292,7 +297,7 @@
               <button type="button"><i class="fa-regular fa-comment" aria-hidden="true"></i> تعليق</button>
               <button type="button"><i class="fa-regular fa-share-from-square" aria-hidden="true"></i> مشاركة</button>
             </div>
-            <button class="message-preview-btn" id="previewCta" type="button">إرسال رسالة</button>
+            <button class="message-preview-btn" id="previewCta" type="button">Choose Campaign Goal</button>
           </article>
         </div>
 

@@ -25,6 +25,7 @@ function doPost(e) {
     sheet.appendRow([
       data.submittedAt || new Date().toISOString(),
       data.campaignGoal || "",
+      data.campaignGoalType || "",
       data.budget || "",
       data.days || "",
       data.dailyReach || "",
@@ -37,6 +38,7 @@ function doPost(e) {
       data.ageFrom || "",
       data.ageTo || "",
       data.gender || "",
+      data.language || "",
       data.languages || "",
       data.interests || "",
       data.caption || "",

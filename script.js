@@ -345,7 +345,11 @@ function getGoalPreviewConfig() {
 }
 
 function getSelectedGoalType() {
-  return form.campaignGoal.selectedOptions[0]?.dataset.goal || "";
+  return form.campaignGoal.value;
+}
+
+function getSelectedGoalLabel() {
+  return form.campaignGoal.selectedOptions[0]?.dataset.label || "";
 }
 
 function isAppDestination(url) {
@@ -436,7 +440,8 @@ function buildPayload() {
 
   return {
     submittedAt: new Date().toISOString(),
-    campaignGoal: form.campaignGoal.value,
+    campaignGoal: getSelectedGoalLabel(),
+    campaignGoalType: getSelectedGoalType(),
     budget,
     days,
     dailyReach,
@@ -449,7 +454,8 @@ function buildPayload() {
     ageFrom: form.ageFrom.value,
     ageTo: form.ageTo.value,
     gender: form.gender.value,
-    languages: Array.from(form.languages.selectedOptions).map((option) => option.value).join(", "),
+    language: form.language.value,
+    languages: form.language.value,
     interests: form.interests.value.trim(),
     caption: form.caption.value.trim(),
     shortDescription: form.shortDescription.value.trim(),
