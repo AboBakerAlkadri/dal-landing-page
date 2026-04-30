@@ -178,7 +178,6 @@ h1 {
   max-width: 31rem;
 }
 
-.primary-cta,
 .primary-btn,
 .secondary-btn,
 .store-btn,
@@ -194,7 +193,6 @@ h1 {
   transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
-.primary-cta,
 .primary-btn {
   border: 0;
   color: #111;
@@ -202,12 +200,6 @@ h1 {
   box-shadow: 0 14px 28px rgba(255, 224, 27, 0.22);
 }
 
-.primary-cta {
-  margin-top: 16px;
-  width: 100%;
-}
-
-.primary-cta:hover,
 .primary-btn:hover,
 .secondary-btn:hover,
 .store-btn:hover,
@@ -226,7 +218,14 @@ h1 {
 
 .section-panel h2 {
   margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-size: 1.1rem;
+}
+
+.section-panel h2 i {
+  color: var(--yellow);
 }
 
 .download-grid {
