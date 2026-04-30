@@ -60,19 +60,19 @@ const SYRIA_LOCATIONS = {
 
 const GOAL_PREVIEW_CONFIG = {
   "الوعي والانتشار CPM": {
-    cta: "معرفة المزيد",
+    cta: "Learn More",
     tone: "awareness"
   },
   "التفاعل والمشاركات": {
-    cta: "زيارة الملف الشخصي",
+    cta: "View Profile",
     tone: "engagement"
   },
   "تلقي رسائل واتساب/ماسنجر": {
-    cta: "إرسال رسالة",
+    cta: "Send WhatsApp Message",
     tone: "messages"
   },
   "زيارات الموقع والتطبيق": {
-    cta: "زيارة الرابط",
+    cta: "Visit Website",
     tone: "traffic"
   }
 };
@@ -296,10 +296,22 @@ function updateGoalFields() {
 }
 
 function getGoalPreviewConfig(goal) {
+  if (goal === "زيارات الموقع والتطبيق" && isAppDestination(form.destinationUrl.value)) {
+    return {
+      cta: "Install Now",
+      tone: "traffic"
+    };
+  }
+
   return GOAL_PREVIEW_CONFIG[goal] || {
-    cta: "اختر هدف الحملة",
+    cta: "Choose Campaign Goal",
     tone: "default"
   };
+}
+
+function isAppDestination(url) {
+  const value = url.trim().toLowerCase();
+  return value.includes("play.google.com") || value.includes("apps.apple.com") || value.includes("app");
 }
 
 function updatePreviewImage() {
