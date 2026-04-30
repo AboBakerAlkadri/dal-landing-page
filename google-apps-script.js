@@ -33,6 +33,7 @@ function doPost(e) {
       data.totalCost || "",
       data.audienceQuality || "",
       data.governorate || "",
+      data.governorates || "",
       data.city || "",
       data.regions || "",
       data.ageFrom || "",
@@ -47,6 +48,7 @@ function doPost(e) {
       data.whatsappNumber || "",
       data.destinationUrl || "",
       data.imageFileName || "",
+      data.logoFileName || "",
       data.phone || "",
       data.customerName || ""
     ]);

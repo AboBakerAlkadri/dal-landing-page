@@ -441,6 +441,21 @@ button.action-link {
   font-size: 1.35rem;
 }
 
+.back-home-btn {
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  color: var(--text);
+  background: var(--card-soft);
+  font-size: 0.86rem;
+  font-weight: 800;
+}
+
 .steps {
   display: flex;
   gap: 8px;
@@ -522,9 +537,81 @@ textarea:focus {
   border-color: var(--yellow);
 }
 
+.range-control {
+  display: grid;
+  gap: 10px;
+}
+
+.stepper {
+  display: grid;
+  grid-template-columns: 44px 1fr 44px;
+  gap: 8px;
+}
+
+.stepper button {
+  min-height: 48px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  color: #111;
+  background: var(--yellow);
+  font-size: 1.15rem;
+  font-weight: 900;
+}
+
+input[type="range"] {
+  min-height: 28px;
+  padding: 0;
+  accent-color: var(--yellow);
+  background: transparent;
+}
+
 .two-cols {
   display: grid;
   gap: 10px;
+}
+
+.audience-picker {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.audience-picker > span {
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.governorate-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.check-row {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  color: var(--text);
+  background: var(--card);
+  font-size: 0.86rem;
+  font-weight: 800;
+}
+
+.check-row--all {
+  border-color: rgba(255, 224, 27, 0.45);
+  background: rgba(255, 224, 27, 0.08);
+}
+
+.check-row input {
+  width: 18px;
+  min-height: 18px;
+  accent-color: var(--yellow);
 }
 
 .estimate-card {
@@ -567,6 +654,8 @@ textarea:focus {
   width: 42px;
   height: 42px;
   border-radius: 50%;
+  object-fit: cover;
+  background: #f0f2f5;
 }
 
 .preview-head span {

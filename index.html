@@ -13,7 +13,7 @@
   <link rel="icon" href="dal-icon.jpg">
   <link rel="preconnect" href="https://cdnjs.cloudflare.com">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <link rel="stylesheet" href="style.css?v=20260430-cta-language-fix">
+  <link rel="stylesheet" href="style.css?v=20260430-audience-budget-logo">
 </head>
 <body>
   <div class="preloader" id="preloader" aria-label="جارٍ تحميل الصفحة">
@@ -140,6 +140,10 @@
       <div class="modal-heading">
         <p class="eyebrow">طلب إعلان ممول</p>
         <h2 id="campaignTitle">إطلاق حملة ترويجية جديدة</h2>
+        <button class="back-home-btn" type="button" data-close-modal>
+          <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+          العودة للصفحة الرئيسية
+        </button>
       </div>
 
       <div class="steps" aria-label="خطوات الاستمارة">
@@ -176,11 +180,25 @@
           <div class="two-cols">
             <label>
               الميزانية بالدولار
-              <input type="number" name="budget" min="1" step="1" placeholder="مثال: 50" required>
+              <div class="range-control">
+                <div class="stepper">
+                  <button type="button" data-stepper="budget" data-change="-5">-</button>
+                  <input type="number" name="budget" min="1" max="10000" step="1" value="50" required>
+                  <button type="button" data-stepper="budget" data-change="5">+</button>
+                </div>
+                <input type="range" name="budgetRange" min="1" max="10000" step="1" value="50" aria-label="الميزانية بالدولار">
+              </div>
             </label>
             <label>
               عدد الأيام
-              <input type="number" name="days" min="1" step="1" placeholder="مثال: 7" required>
+              <div class="range-control">
+                <div class="stepper">
+                  <button type="button" data-stepper="days" data-change="-1">-</button>
+                  <input type="number" name="days" min="1" max="365" step="1" value="7" required>
+                  <button type="button" data-stepper="days" data-change="1">+</button>
+                </div>
+                <input type="range" name="daysRange" min="1" max="365" step="1" value="7" aria-label="عدد الأيام">
+              </div>
             </label>
           </div>
           <div class="estimate-card" aria-live="polite">
@@ -193,19 +211,13 @@
 
         <div class="form-step" data-step="2">
           <h3>الجمهور المستهدف</h3>
-          <div class="two-cols">
-            <label>
-              المحافظة
-              <select name="governorate" required>
-                <option value="">اختر المحافظة</option>
-              </select>
+          <div class="audience-picker">
+            <span>المحافظات المستهدفة</span>
+            <label class="check-row check-row--all">
+              <input type="checkbox" name="allSyria" value="كامل سوريا">
+              <strong>كامل سوريا</strong>
             </label>
-            <label>
-              المدينة
-              <select name="city" required disabled>
-                <option value="">اختر المدينة</option>
-              </select>
-            </label>
+            <div class="governorate-grid" id="governorateOptions" aria-label="اختيار المحافظات"></div>
           </div>
           <div class="two-cols">
             <label>
@@ -248,6 +260,10 @@
         <div class="form-step" data-step="3">
           <h3>المحتوى والمعاينة</h3>
           <label>
+            رفع شعار المؤسسة أو الموقع اختياري
+            <input type="file" name="companyLogo" accept="image/*">
+          </label>
+          <label>
             الاسم اختياري
             <input type="text" name="customerName" placeholder="اسمك">
           </label>
@@ -274,7 +290,7 @@
 
           <article class="ad-preview">
             <div class="preview-head">
-              <img src="dal-icon.jpg" alt="">
+              <img src="dal-icon.jpg" id="previewLogo" alt="">
               <div>
                 <strong>تطبيق دال</strong>
                 <span>إعلان ممول · <i class="fa-solid fa-earth-americas" aria-hidden="true"></i></span>
@@ -317,6 +333,6 @@
     تواصل معنا
   </a>
 
-  <script src="script.js?v=20260430-cta-language-fix"></script>
+  <script src="script.js?v=20260430-audience-budget-logo"></script>
 </body>
 </html>

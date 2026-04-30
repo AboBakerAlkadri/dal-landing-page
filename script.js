@@ -33,11 +33,14 @@ const previewShort = document.getElementById("previewShort");
 const previewLong = document.getElementById("previewLong");
 const previewImage = document.getElementById("previewImage");
 const previewCta = document.getElementById("previewCta");
+const previewLogo = document.getElementById("previewLogo");
 const whatsappGoalField = document.getElementById("whatsappGoalField");
 const destinationGoalField = document.getElementById("destinationGoalField");
+const governorateOptions = document.getElementById("governorateOptions");
 
 let currentStep = 1;
 let previewImageUrls = [];
+let previewLogoUrl = "";
 const PRELOADER_MIN_TIME = 1400;
 const pageStartTime = Date.now();
 
@@ -161,8 +164,18 @@ form.addEventListener("input", () => {
 });
 
 form.campaignGoal.addEventListener("change", updateGoalFields);
-form.governorate.addEventListener("change", updateCities);
 form.adImages.addEventListener("change", updatePreviewImage);
+form.companyLogo.addEventListener("change", updatePreviewLogo);
+form.budget.addEventListener("input", () => syncRangeFromNumber("budget"));
+form.budgetRange.addEventListener("input", () => syncNumberFromRange("budget"));
+form.days.addEventListener("input", () => syncRangeFromNumber("days"));
+form.daysRange.addEventListener("input", () => syncNumberFromRange("days"));
+
+document.querySelectorAll("[data-stepper]").forEach((button) => {
+  button.addEventListener("click", () => {
+    changeStepperValue(button.dataset.stepper, Number(button.dataset.change));
+  });
+});
 
 window.handleCampaignGoalChange = function handleCampaignGoalChange() {
   updateGoalFields();
@@ -198,10 +211,11 @@ form.addEventListener("submit", async (event) => {
 
     form.reset();
     currentStep = 1;
-    updateCities();
+    updateGovernorateSelection();
     updateEstimate();
     updatePreview();
     updatePreviewImage();
+    updatePreviewLogo();
     updateStep();
     showMessage("تم إرسال طلبك بنجاح، سيتواصل معك فريق دال قريبًا.", "success");
   } catch (error) {
@@ -246,6 +260,12 @@ function validateCurrentStep() {
   const ageFrom = Number(form.ageFrom.value);
   const ageTo = Number(form.ageTo.value);
   if (currentStep === 2) {
+    if (getSelectedGovernorates().length === 0) {
+      showMessage("يرجى اختيار محافظة واحدة على الأقل أو اختيار كامل سوريا.", "error");
+      form.allSyria.focus();
+      return false;
+    }
+
     if (ageFrom < 18 || ageFrom > 60 || ageTo < 18 || ageTo > 60) {
       showMessage("العمر يجب أن يكون بين 18 و60 سنة.", "error");
       form.ageFrom.focus();
@@ -287,16 +307,16 @@ function updateEstimate() {
 
   document.getElementById("dailyReach").textContent = formatNumber(dailyReach);
   document.getElementById("totalReach").textContent = formatNumber(totalReach);
-  document.getElementById("totalCost").textContent = `${budget || 0}$`;
+  document.getElementById("totalCost").textContent = `$${formatNumber(budget)}`;
   document.getElementById("audienceQuality").textContent = quality;
 }
 
 function getAudienceQuality(budget, days) {
-  if (!budget || !days) return "تحتاج بيانات";
+  if (!budget || !days) return "Needs data";
   const dailyBudget = budget / days;
-  if (dailyBudget >= 15) return "قوية";
-  if (dailyBudget >= 7) return "جيدة";
-  return "محدودة";
+  if (dailyBudget >= 15) return "Strong";
+  if (dailyBudget >= 7) return "Good";
+  return "Limited";
 }
 
 function updatePreview() {
@@ -377,6 +397,22 @@ function updatePreviewImage() {
   renderPreviewCarousel();
 }
 
+function updatePreviewLogo() {
+  if (previewLogoUrl) {
+    URL.revokeObjectURL(previewLogoUrl);
+    previewLogoUrl = "";
+  }
+
+  const file = form.companyLogo.files[0];
+  if (!file) {
+    previewLogo.src = "dal-icon.jpg";
+    return;
+  }
+
+  previewLogoUrl = URL.createObjectURL(file);
+  previewLogo.src = previewLogoUrl;
+}
+
 function renderPreviewCarousel() {
   previewImage.innerHTML = "";
 
@@ -421,24 +457,54 @@ function renderPreviewCarousel() {
 
 function populateGovernorates() {
   Object.keys(SYRIA_LOCATIONS).forEach((governorate) => {
-    const option = document.createElement("option");
-    option.value = governorate;
-    option.textContent = governorate;
-    form.governorate.appendChild(option);
+    const label = document.createElement("label");
+    label.className = "check-row";
+    label.innerHTML = `<input type="checkbox" name="governorates" value="${governorate}"><span>${governorate}</span>`;
+    governorateOptions.appendChild(label);
+  });
+
+  form.allSyria.addEventListener("change", updateGovernorateSelection);
+  form.querySelectorAll('input[name="governorates"]').forEach((checkbox) => {
+    checkbox.addEventListener("change", updateGovernorateSelection);
   });
 }
 
-function updateCities() {
-  const cities = SYRIA_LOCATIONS[form.governorate.value] || [];
-  form.city.innerHTML = '<option value="">اختر المدينة</option>';
-  form.city.disabled = cities.length === 0;
-
-  cities.forEach((city) => {
-    const option = document.createElement("option");
-    option.value = city;
-    option.textContent = city;
-    form.city.appendChild(option);
+function updateGovernorateSelection() {
+  const allChecked = form.allSyria.checked;
+  form.querySelectorAll('input[name="governorates"]').forEach((checkbox) => {
+    checkbox.disabled = allChecked;
+    checkbox.checked = allChecked ? false : checkbox.checked;
   });
+}
+
+function getSelectedGovernorates() {
+  if (form.allSyria.checked) return ["كامل سوريا"];
+  return Array.from(form.querySelectorAll('input[name="governorates"]:checked')).map((checkbox) => checkbox.value);
+}
+
+function syncRangeFromNumber(name) {
+  const numberInput = form[name];
+  const rangeInput = form[`${name}Range`];
+  const min = Number(numberInput.min);
+  const max = Number(numberInput.max);
+  const value = Math.min(Math.max(Number(numberInput.value) || min, min), max);
+
+  numberInput.value = value;
+  rangeInput.value = value;
+  updateEstimate();
+  updatePreview();
+}
+
+function syncNumberFromRange(name) {
+  form[name].value = form[`${name}Range`].value;
+  updateEstimate();
+  updatePreview();
+}
+
+function changeStepperValue(name, change) {
+  const input = form[name];
+  input.value = (Number(input.value) || 0) + change;
+  syncRangeFromNumber(name);
 }
 
 function buildPayload() {
@@ -447,6 +513,8 @@ function buildPayload() {
   const dailyReach = Math.round((days > 0 ? budget / days : 0) * 850);
   const totalReach = dailyReach * days;
   const fileNames = Array.from(form.adImages.files).map((file) => file.name).join(", ");
+  const logoFileName = form.companyLogo.files[0]?.name || "";
+  const selectedGovernorates = getSelectedGovernorates();
 
   return {
     submittedAt: new Date().toISOString(),
@@ -458,9 +526,10 @@ function buildPayload() {
     totalReach,
     totalCost: budget,
     audienceQuality: getAudienceQuality(budget, days),
-    governorate: form.governorate.value,
-    city: form.city.value,
-    regions: `${form.governorate.value} - ${form.city.value}`,
+    governorate: selectedGovernorates.join(", "),
+    governorates: selectedGovernorates.join(", "),
+    city: "",
+    regions: selectedGovernorates.join(", "),
     ageFrom: form.ageFrom.value,
     ageTo: form.ageTo.value,
     gender: form.gender.value,
@@ -473,13 +542,14 @@ function buildPayload() {
     whatsappNumber: form.whatsappNumber.value.trim(),
     destinationUrl: form.destinationUrl.value.trim(),
     imageFileName: fileNames,
+    logoFileName,
     phone: form.phone.value.trim(),
     customerName: form.customerName.value.trim()
   };
 }
 
 function formatNumber(value) {
-  return new Intl.NumberFormat("ar-SY").format(value || 0);
+  return new Intl.NumberFormat("en-US").format(value || 0);
 }
 
 function showMessage(text, type) {
