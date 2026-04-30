@@ -281,6 +281,7 @@ form.addEventListener("submit", async (event) => {
 
     form.reset();
     clearSavedFormState();
+    setDefaultLanguages();
     currentStep = 1;
     updateGovernorateSelection();
     updateEstimate();
@@ -630,6 +631,12 @@ function updateLanguageSummary() {
   languageSummary.textContent = selectedLanguages.length ? selectedLanguages.join("، ") : "اختر لغة أو أكثر";
 }
 
+function setDefaultLanguages() {
+  form.querySelectorAll('input[name="languages"]').forEach((checkbox) => {
+    checkbox.checked = checkbox.value === "العربية";
+  });
+}
+
 function clampNumber(value, min, max) {
   const number = Number(value);
   if (Number.isNaN(number)) return min;
@@ -744,5 +751,6 @@ updateGoalFields();
 updatePreview();
 normalizeAgeRange();
 updateOtherInterestsField();
+setDefaultLanguages();
 updateLanguageSummary();
 updateStep();
