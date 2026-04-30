@@ -748,10 +748,56 @@ input[type="range"] {
   margin-bottom: 14px;
 }
 
-.audience-picker > span {
+.audience-picker > span,
+.multi-select > span {
   color: var(--muted);
   font-size: 0.9rem;
   font-weight: 800;
+}
+
+.multi-select {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.multi-select details {
+  position: relative;
+}
+
+.multi-select summary {
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  color: var(--text);
+  background: var(--card);
+  cursor: pointer;
+  list-style: none;
+}
+
+.multi-select summary::-webkit-details-marker {
+  display: none;
+}
+
+.multi-select summary::after {
+  content: "\f107";
+  margin-right: auto;
+  color: var(--muted);
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+}
+
+.multi-select-menu {
+  display: grid;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--card-soft);
 }
 
 .governorate-grid {

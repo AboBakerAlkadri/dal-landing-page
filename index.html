@@ -220,20 +220,22 @@
               <option value="نساء">نساء</option>
             </select>
           </label>
-          <label>
-            اللغة
-            <select name="language" id="language" required>
-              <option value="">اختر اللغة</option>
-              <option value="العربية">العربية</option>
-              <option value="الإنجليزية">الإنجليزية</option>
-              <option value="التركية">التركية</option>
-              <option value="الفرنسية">الفرنسية</option>
-              <option value="الألمانية">الألمانية</option>
-              <option value="الصينية">الصينية</option>
-              <option value="الروسية">الروسية</option>
-              <option value="الكردية">الكردية</option>
-            </select>
-          </label>
+          <div class="multi-select" id="languageDropdown">
+            <span>اللغات</span>
+            <details>
+              <summary id="languageSummary">اختر لغة أو أكثر</summary>
+              <div class="multi-select-menu">
+                <label class="check-row"><input type="checkbox" name="languages" value="العربية"> العربية</label>
+                <label class="check-row"><input type="checkbox" name="languages" value="الإنجليزية"> الإنجليزية</label>
+                <label class="check-row"><input type="checkbox" name="languages" value="التركية"> التركية</label>
+                <label class="check-row"><input type="checkbox" name="languages" value="الفرنسية"> الفرنسية</label>
+                <label class="check-row"><input type="checkbox" name="languages" value="الألمانية"> الألمانية</label>
+                <label class="check-row"><input type="checkbox" name="languages" value="الصينية"> الصينية</label>
+                <label class="check-row"><input type="checkbox" name="languages" value="الروسية"> الروسية</label>
+                <label class="check-row"><input type="checkbox" name="languages" value="الكردية"> الكردية</label>
+              </div>
+            </details>
+          </div>
           <label>
             الاهتمامات
             <select name="interests" required>
@@ -378,6 +380,6 @@
     </section>
   </div>
 
-  <script src="script.js?v=20260430-other-interests"></script>
+  <script src="script.js?v=20260430-multi-language"></script>
 </body>
 </html>
