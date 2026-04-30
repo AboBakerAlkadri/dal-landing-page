@@ -10,8 +10,9 @@
 8. انسخ Web App URL وضعه في GOOGLE_SCRIPT_URL داخل script.js.
 */
 
-const CAMPAIGN_SHEET_ID = "PUT_YOUR_CAMPAIGN_GOOGLE_SHEET_ID_HERE";
+const CAMPAIGN_SHEET_ID = "1ToD5hxa_6fefZKwxSe2mAO9hSGFb2LAT_fHwr4xN3ig";
 const CAMPAIGN_SHEET_NAME = "Leads";
+const CAMPAIGN_IMAGES_FOLDER_NAME = "DAL Campaign Images";
 
 const JOBS_SHEET_ID = "PUT_YOUR_JOBS_GOOGLE_SHEET_ID_HERE";
 const JOBS_SHEET_NAME = "Jobs";
@@ -47,6 +48,9 @@ function appendCampaignLead(data) {
     throw new Error("Campaign sheet not found");
   }
 
+  ensureCampaignHeaders(sheet);
+  const uploadedImages = saveCampaignImages(data.imageFiles || []);
+
   sheet.appendRow([
     data.formType || "campaignLead",
     data.submittedAt || new Date().toISOString(),
@@ -73,11 +77,91 @@ function appendCampaignLead(data) {
     data.whatsappNumber || "",
     data.destinationUrl || "",
     data.imageFileName || "",
-      data.logoFileName || "",
-      data.phone || "",
-      data.contactNumber || "",
-      data.customerName || ""
-    ]);
+    uploadedImages.names,
+    uploadedImages.urls,
+    data.logoFileName || "",
+    data.phone || "",
+    data.contactNumber || "",
+    data.customerName || ""
+  ]);
+}
+
+function ensureCampaignHeaders(sheet) {
+  const headers = [
+    "نوع النموذج",
+    "التاريخ والوقت",
+    "هدف الإعلان",
+    "كود الهدف",
+    "الميزانية",
+    "عدد الأيام",
+    "الوصول اليومي",
+    "إجمالي الوصول",
+    "إجمالي التكلفة",
+    "المحافظة",
+    "المحافظات",
+    "المدينة",
+    "المناطق",
+    "العمر من",
+    "العمر إلى",
+    "الجنس",
+    "اللغة",
+    "اللغات",
+    "الاهتمامات",
+    "نص المنشور",
+    "الوصف المختصر",
+    "الوصف الطويل",
+    "رقم واتساب",
+    "رابط الموقع",
+    "أسماء الصور المختارة",
+    "أسماء الصور المحفوظة",
+    "روابط الصور في Drive",
+    "اسم ملف الشعار",
+    "رقم هاتف المعلن",
+    "رقم الهاتف في الإعلان",
+    "اسم العميل"
+  ];
+
+  if (sheet.getRange(1, 1).getValue() !== headers[0]) {
+    sheet.insertRowBefore(1);
+    sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+    sheet.setFrozenRows(1);
+  }
+}
+
+function saveCampaignImages(imageFiles) {
+  if (!imageFiles.length) {
+    return {
+      names: "",
+      urls: ""
+    };
+  }
+
+  const folder = getOrCreateFolder(CAMPAIGN_IMAGES_FOLDER_NAME);
+  const savedFiles = imageFiles.map((file) => {
+    const bytes = Utilities.base64Decode(file.data);
+    const blob = Utilities.newBlob(bytes, file.mimeType, file.name);
+    const savedFile = folder.createFile(blob);
+    savedFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+
+    return {
+      name: savedFile.getName(),
+      url: savedFile.getUrl()
+    };
+  });
+
+  return {
+    names: savedFiles.map((file) => file.name).join(", "),
+    urls: savedFiles.map((file) => file.url).join(", ")
+  };
+}
+
+function getOrCreateFolder(folderName) {
+  const folders = DriveApp.getFoldersByName(folderName);
+  if (folders.hasNext()) {
+    return folders.next();
+  }
+
+  return DriveApp.createFolder(folderName);
 }
 
 function appendJobApplication(data) {

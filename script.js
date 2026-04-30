@@ -265,7 +265,7 @@ form.addEventListener("submit", async (event) => {
   clearMessage();
 
   try {
-    const payload = buildPayload();
+    const payload = await buildPayload();
     const response = await fetch(GOOGLE_SCRIPT_URL, {
       method: "POST",
       headers: {
@@ -280,6 +280,7 @@ form.addEventListener("submit", async (event) => {
     }
 
     form.reset();
+    clearSavedFormState();
     currentStep = 1;
     updateGovernorateSelection();
     updateEstimate();
@@ -290,6 +291,7 @@ form.addEventListener("submit", async (event) => {
     updateOtherInterestsField();
     updateLanguageSummary();
     updateStep();
+    alert("تم إرسال طلبك بنجاح، سيتواصل معك فريق دال قريبًا.");
     showMessage("تم إرسال طلبك بنجاح، سيتواصل معك فريق دال قريبًا.", "success");
   } catch (error) {
     showMessage("حدث خطأ أثناء الإرسال، يرجى المحاولة مرة أخرى.", "error");
@@ -634,12 +636,13 @@ function clampNumber(value, min, max) {
   return Math.min(Math.max(number, min), max);
 }
 
-function buildPayload() {
+async function buildPayload() {
   const budget = Number(form.budget.value) || 0;
   const days = Number(form.days.value) || 0;
   const dailyReach = Math.round((days > 0 ? budget / days : 0) * 850);
   const totalReach = dailyReach * days;
   const fileNames = Array.from(form.adImages.files).map((file) => file.name).join(", ");
+  const imageFiles = await filesToBase64(form.adImages.files);
   const logoFileName = form.companyLogo.files[0]?.name || "";
   const selectedGovernorates = getSelectedGovernorates();
 
@@ -669,11 +672,47 @@ function buildPayload() {
     whatsappNumber: form.whatsappNumber.value.trim(),
     destinationUrl: form.destinationUrl.value.trim(),
     imageFileName: fileNames,
+    imageFiles,
     logoFileName,
     phone: form.phone.value.trim(),
     contactNumber: form.contactNumber.value.trim(),
     customerName: form.customerName.value.trim()
   };
+}
+
+function filesToBase64(fileList) {
+  return Promise.all(Array.from(fileList).map((file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const result = String(reader.result || "");
+        resolve({
+          name: file.name,
+          mimeType: file.type || "application/octet-stream",
+          data: result.includes(",") ? result.split(",")[1] : result
+        });
+      };
+      reader.onerror = () => reject(reader.error);
+      reader.readAsDataURL(file);
+    });
+  }));
+}
+
+function clearSavedFormState() {
+  previewImageUrls.forEach((item) => URL.revokeObjectURL(item.url));
+  previewImageUrls = [];
+
+  if (previewLogoUrl) {
+    URL.revokeObjectURL(previewLogoUrl);
+    previewLogoUrl = "";
+  }
+
+  try {
+    window.localStorage.removeItem("dalCampaignForm");
+    window.sessionStorage.removeItem("dalCampaignForm");
+  } catch (error) {
+    // التخزين قد يكون غير متاح في بعض المتصفحات الخاصة.
+  }
 }
 
 function getSelectedInterests() {
