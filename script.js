@@ -42,6 +42,7 @@ const previewImage = document.getElementById("previewImage");
 const previewCta = document.getElementById("previewCta");
 const previewLogo = document.getElementById("previewLogo");
 const governorateOptions = document.getElementById("governorateOptions");
+const otherInterestsField = document.getElementById("otherInterestsField");
 
 let currentStep = 1;
 let previewImageUrls = [];
@@ -218,6 +219,7 @@ form.ageFrom.addEventListener("input", () => syncRangeFromNumber("ageFrom"));
 form.ageFromRange.addEventListener("input", () => syncNumberFromRange("ageFrom"));
 form.ageTo.addEventListener("input", () => syncRangeFromNumber("ageTo"));
 form.ageToRange.addEventListener("input", () => syncNumberFromRange("ageTo"));
+form.interests.addEventListener("change", updateOtherInterestsField);
 
 document.querySelectorAll("[data-stepper]").forEach((button) => {
   button.addEventListener("click", () => {
@@ -265,6 +267,7 @@ form.addEventListener("submit", async (event) => {
     updatePreviewImage();
     updatePreviewLogo();
     normalizeAgeRange();
+    updateOtherInterestsField();
     updateStep();
     showMessage("تم إرسال طلبك بنجاح، سيتواصل معك فريق دال قريبًا.", "success");
   } catch (error) {
@@ -311,6 +314,12 @@ function validateCurrentStep() {
     if (ageFrom > ageTo) {
       showMessage("العمر من يجب أن يكون أقل من أو يساوي العمر إلى.", "error");
       form.ageFrom.focus();
+      return false;
+    }
+
+    if (form.interests.value === "غير ذلك" && !form.otherInterests.value.trim()) {
+      showMessage("يرجى كتابة الاهتمامات المطلوبة.", "error");
+      form.otherInterests.focus();
       return false;
     }
   }
@@ -577,6 +586,16 @@ function normalizeAgeRange(changedName = "") {
   form.ageToRange.min = ageFrom;
 }
 
+function updateOtherInterestsField() {
+  const shouldShow = form.interests.value === "غير ذلك";
+  otherInterestsField.hidden = !shouldShow;
+  form.otherInterests.required = shouldShow;
+
+  if (!shouldShow) {
+    form.otherInterests.value = "";
+  }
+}
+
 function clampNumber(value, min, max) {
   const number = Number(value);
   if (Number.isNaN(number)) return min;
@@ -610,7 +629,7 @@ function buildPayload() {
     gender: form.gender.value,
     language: form.language.value,
     languages: form.language.value,
-    interests: form.interests.value.trim(),
+    interests: getSelectedInterests(),
     caption: form.caption.value.trim(),
     shortDescription: form.shortDescription.value.trim(),
     longDescription: form.longDescription.value.trim(),
@@ -622,6 +641,14 @@ function buildPayload() {
     contactNumber: form.contactNumber.value.trim(),
     customerName: form.customerName.value.trim()
   };
+}
+
+function getSelectedInterests() {
+  if (form.interests.value === "غير ذلك") {
+    return form.otherInterests.value.trim();
+  }
+
+  return form.interests.value.trim();
 }
 
 function formatNumber(value) {
@@ -642,4 +669,5 @@ updateEstimate();
 updateGoalFields();
 updatePreview();
 normalizeAgeRange();
+updateOtherInterestsField();
 updateStep();

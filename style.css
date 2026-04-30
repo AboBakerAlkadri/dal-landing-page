@@ -669,6 +669,10 @@ label {
   display: none;
 }
 
+.other-interests-field[hidden] {
+  display: none;
+}
+
 .goal-extra-field {
   margin: -2px 0 4px;
   padding: 12px;
