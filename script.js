@@ -113,6 +113,11 @@ document.querySelectorAll("[data-link]").forEach((element) => {
   const key = element.dataset.link;
   if (LINKS[key]) {
     element.href = LINKS[key];
+    if (LINKS[key].startsWith("http") && element.hasAttribute("data-direct-link")) {
+      element.target = "_blank";
+      element.rel = "noopener noreferrer";
+    }
+
     if (LINKS[key].startsWith("http") && !element.hasAttribute("data-direct-link")) {
       element.addEventListener("click", (event) => {
         event.preventDefault();
