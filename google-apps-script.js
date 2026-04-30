@@ -67,10 +67,8 @@ function appendCampaignLead(data) {
   const uploadedImages = saveCampaignImages(data.imageFiles || []);
 
   sheet.appendRow([
-    data.formType || "campaignLead",
     data.submittedAt || new Date().toISOString(),
     data.campaignGoal || "",
-    data.campaignGoalType || "",
     data.budget || "",
     data.days || "",
     data.dailyReach || "",
@@ -101,10 +99,8 @@ function appendCampaignLead(data) {
 
 function ensureCampaignHeaders(sheet) {
   const headers = [
-    "نوع النموذج",
     "التاريخ والوقت",
     "هدف الإعلان",
-    "كود الهدف",
     "الميزانية",
     "عدد الأيام",
     "الوصول اليومي",
