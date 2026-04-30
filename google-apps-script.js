@@ -37,6 +37,7 @@ function doPost(e) {
       data.ageFrom || "",
       data.ageTo || "",
       data.gender || "",
+      data.languages || "",
       data.interests || "",
       data.caption || "",
       data.shortDescription || "",

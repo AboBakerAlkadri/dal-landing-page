@@ -59,19 +59,19 @@ const SYRIA_LOCATIONS = {
 };
 
 const GOAL_PREVIEW_CONFIG = {
-  "الوعي والانتشار CPM": {
+  awareness: {
     cta: "Learn More",
     tone: "awareness"
   },
-  "التفاعل والمشاركات": {
+  engagement: {
     cta: "View Profile",
     tone: "engagement"
   },
-  "تلقي رسائل واتساب/ماسنجر": {
+  messages: {
     cta: "Send WhatsApp Message",
     tone: "messages"
   },
-  "زيارات الموقع والتطبيق": {
+  traffic: {
     cta: "Visit Website",
     tone: "traffic"
   }
@@ -213,9 +213,28 @@ function validateCurrentStep() {
   const requiredFields = activeStep.querySelectorAll("[required]");
 
   for (const field of requiredFields) {
-    if (!field.value.trim()) {
+    const isEmptyMultipleSelect = field.tagName === "SELECT" && field.multiple && field.selectedOptions.length === 0;
+    const isEmptyField = !field.multiple && !field.value.trim();
+
+    if (isEmptyMultipleSelect || isEmptyField) {
       field.focus();
       showMessage("يرجى تعبئة الحقول الأساسية قبل المتابعة.", "error");
+      return false;
+    }
+  }
+
+  if (currentStep === 1) {
+    const goalType = getSelectedGoalType();
+
+    if (goalType === "messages" && !isValidPhoneNumber(form.whatsappNumber.value)) {
+      showMessage("يرجى إدخال رقم واتساب صحيح مع رمز الدولة، مثال: 963939769472.", "error");
+      form.whatsappNumber.focus();
+      return false;
+    }
+
+    if (goalType === "traffic" && !isValidUrl(form.destinationUrl.value)) {
+      showMessage("يرجى إدخال رابط صحيح يبدأ بـ https:// أو http://.", "error");
+      form.destinationUrl.focus();
       return false;
     }
   }
@@ -238,6 +257,20 @@ function validateCurrentStep() {
 
   clearMessage();
   return true;
+}
+
+function isValidPhoneNumber(value) {
+  const normalized = value.replace(/[\s()+-]/g, "");
+  return /^\d{8,15}$/.test(normalized);
+}
+
+function isValidUrl(value) {
+  try {
+    const url = new URL(value.trim());
+    return url.protocol === "https:" || url.protocol === "http:";
+  } catch (error) {
+    return false;
+  }
 }
 
 function updateEstimate() {
@@ -270,7 +303,7 @@ function updatePreview() {
   previewText.textContent = caption || "سيظهر نص الإعلان هنا أثناء الكتابة.";
   previewShort.textContent = shortDescription || "وصف مختصر للحملة";
   previewLong.textContent = longDescription || "تفاصيل الإعلان تظهر هنا بشكل مشابه لإعلانات فيسبوك.";
-  const goalPreview = getGoalPreviewConfig(form.campaignGoal.value);
+  const goalPreview = getGoalPreviewConfig();
   previewCta.textContent = goalPreview.cta;
   previewCta.dataset.goalTone = goalPreview.tone;
 
@@ -280,9 +313,9 @@ function updatePreview() {
 }
 
 function updateGoalFields() {
-  const goal = form.campaignGoal.value;
-  const needsWhatsapp = goal === "تلقي رسائل واتساب/ماسنجر";
-  const needsDestination = goal === "زيارات الموقع والتطبيق";
+  const goalType = getSelectedGoalType();
+  const needsWhatsapp = goalType === "messages";
+  const needsDestination = goalType === "traffic";
 
   whatsappGoalField.hidden = !needsWhatsapp;
   destinationGoalField.hidden = !needsDestination;
@@ -295,18 +328,24 @@ function updateGoalFields() {
   updatePreview();
 }
 
-function getGoalPreviewConfig(goal) {
-  if (goal === "زيارات الموقع والتطبيق" && isAppDestination(form.destinationUrl.value)) {
+function getGoalPreviewConfig() {
+  const goalType = getSelectedGoalType();
+
+  if (goalType === "traffic" && isAppDestination(form.destinationUrl.value)) {
     return {
       cta: "Install Now",
       tone: "traffic"
     };
   }
 
-  return GOAL_PREVIEW_CONFIG[goal] || {
+  return GOAL_PREVIEW_CONFIG[goalType] || {
     cta: "Choose Campaign Goal",
     tone: "default"
   };
+}
+
+function getSelectedGoalType() {
+  return form.campaignGoal.selectedOptions[0]?.dataset.goal || "";
 }
 
 function isAppDestination(url) {
@@ -354,7 +393,7 @@ function renderPreviewCarousel() {
 
     const button = document.createElement("button");
     button.type = "button";
-    const goalPreview = getGoalPreviewConfig(form.campaignGoal.value);
+    const goalPreview = getGoalPreviewConfig();
     button.textContent = goalPreview.cta;
     button.dataset.goalTone = goalPreview.tone;
 
@@ -410,6 +449,7 @@ function buildPayload() {
     ageFrom: form.ageFrom.value,
     ageTo: form.ageTo.value,
     gender: form.gender.value,
+    languages: Array.from(form.languages.selectedOptions).map((option) => option.value).join(", "),
     interests: form.interests.value.trim(),
     caption: form.caption.value.trim(),
     shortDescription: form.shortDescription.value.trim(),

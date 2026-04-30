@@ -155,10 +155,10 @@
             الهدف من الإعلان
             <select name="campaignGoal" required>
               <option value="">اختر الهدف</option>
-              <option value="الوعي والانتشار CPM">الوعي والانتشار CPM</option>
-              <option value="التفاعل والمشاركات">التفاعل والمشاركات</option>
-              <option value="تلقي رسائل واتساب/ماسنجر">تلقي رسائل واتساب/ماسنجر</option>
-              <option value="زيارات الموقع والتطبيق">زيارات الموقع والتطبيق</option>
+              <option value="الوعي والانتشار CPM" data-goal="awareness">الوعي والانتشار CPM</option>
+              <option value="التفاعل والمشاركات" data-goal="engagement">التفاعل والمشاركات</option>
+              <option value="تلقي رسائل واتساب/ماسنجر" data-goal="messages">تلقي رسائل واتساب/ماسنجر</option>
+              <option value="زيارات الموقع والتطبيق" data-goal="traffic">زيارات الموقع والتطبيق</option>
             </select>
           </label>
           <div class="goal-extra-field" id="whatsappGoalField" hidden>
@@ -223,6 +223,15 @@
               <option value="الكل">الكل</option>
               <option value="رجال">رجال</option>
               <option value="نساء">نساء</option>
+            </select>
+          </label>
+          <label>
+            اللغات
+            <select name="languages" multiple size="4" required>
+              <option value="العربية" selected>العربية</option>
+              <option value="الإنجليزية">الإنجليزية</option>
+              <option value="الكردية">الكردية</option>
+              <option value="التركية">التركية</option>
             </select>
           </label>
           <label>
