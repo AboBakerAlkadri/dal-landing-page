@@ -126,6 +126,33 @@ function ensureCampaignHeaders(sheet) {
     sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
     sheet.setFrozenRows(1);
   }
+
+  formatCampaignSheet(sheet, headers.length);
+}
+
+function formatCampaignSheet(sheet, headersCount) {
+  const lastRow = Math.max(sheet.getLastRow(), 1);
+
+  sheet.getRange(1, 1, 1, headersCount)
+    .setFontFamily("Calibri")
+    .setFontSize(16)
+    .setFontWeight("bold")
+    .setFontColor("#d60000")
+    .setBackground("#ffe01b")
+    .setHorizontalAlignment("center")
+    .setVerticalAlignment("middle");
+
+  if (lastRow > 1) {
+    sheet.getRange(2, 1, lastRow - 1, headersCount)
+      .setFontFamily("Calibri")
+      .setFontSize(12)
+      .setFontWeight("normal")
+      .setFontColor("#000000")
+      .setBackground("#ffffff")
+      .setVerticalAlignment("middle");
+  }
+
+  sheet.autoResizeColumns(1, headersCount);
 }
 
 function saveCampaignImages(imageFiles) {
