@@ -73,12 +73,11 @@ function appendCampaignLead(data) {
     data.whatsappNumber || "",
     data.destinationUrl || "",
     data.imageFileName || "",
-    data.logoFileName || "",
-    data.phone || "",
-    data.contactNumber || "",
-    data.customerName || "",
-    data.customerId || ""
-  ]);
+      data.logoFileName || "",
+      data.phone || "",
+      data.contactNumber || "",
+      data.customerName || ""
+    ]);
 }
 
 function appendJobApplication(data) {

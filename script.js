@@ -152,7 +152,6 @@ quickContactToggle.addEventListener("click", () => {
 });
 
 window.addEventListener("scroll", hideQuickContactMenu, { passive: true });
-window.addEventListener("wheel", hideQuickContactMenu, { passive: true });
 document.addEventListener("touchstart", (event) => {
   if (!event.target.closest("#quickContact")) {
     hideQuickContactMenu();
@@ -163,11 +162,6 @@ document.addEventListener("pointerdown", (event) => {
     hideQuickContactMenu();
   }
 });
-document.addEventListener("pointermove", (event) => {
-  if (!quickContactMenu.hidden && !event.target.closest("#quickContact")) {
-    hideQuickContactMenu();
-  }
-}, { passive: true });
 
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape" && modal.classList.contains("is-open")) {
@@ -678,8 +672,7 @@ function buildPayload() {
     logoFileName,
     phone: form.phone.value.trim(),
     contactNumber: form.contactNumber.value.trim(),
-    customerName: form.customerName.value.trim(),
-    customerId: form.customerId.value.trim()
+    customerName: form.customerName.value.trim()
   };
 }
 
