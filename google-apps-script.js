@@ -67,8 +67,13 @@ function appendCampaignLead(data) {
   removeDeprecatedCampaignColumns(sheet);
   ensureCampaignHeaders(sheet);
   const uploadedImages = saveCampaignImages(data.imageFiles || []);
+  const row = buildCampaignRow(data, uploadedImages);
 
-  sheet.appendRow([
+  sheet.appendRow(row);
+}
+
+function buildCampaignRow(data, uploadedImages) {
+  return [
     data.submittedAt || new Date().toISOString(),
     data.campaignGoal || "",
     data.budget || "",
@@ -76,13 +81,11 @@ function appendCampaignLead(data) {
     data.dailyReach || "",
     data.totalReach || "",
     data.totalCost || "",
-    data.governorate || "",
-    data.governorates || "",
-    data.regions || "",
+    data.governorates || data.regions || data.governorate || "",
     data.ageFrom || "",
     data.ageTo || "",
     data.gender || "",
-    data.languages || "",
+    data.languages || data.language || "",
     data.interests || "",
     data.caption || "",
     data.shortDescription || "",
@@ -94,7 +97,7 @@ function appendCampaignLead(data) {
     data.phone || "",
     data.contactNumber || "",
     data.customerName || ""
-  ]);
+  ];
 }
 
 function ensureCampaignHeaders(sheet) {
@@ -106,9 +109,7 @@ function ensureCampaignHeaders(sheet) {
     "الوصول اليومي",
     "إجمالي الوصول",
     "إجمالي التكلفة",
-    "المحافظة",
-    "المحافظات",
-    "المناطق",
+    "المحافظات المستهدفة",
     "العمر من",
     "العمر إلى",
     "الجنس",
@@ -142,6 +143,9 @@ function removeDeprecatedCampaignColumns(sheet) {
     "كود الهدف",
     "المدينة",
     "اللغة",
+    "المحافظة",
+    "المحافظات",
+    "المناطق",
     "أسماء الصور المختارة",
     "أسماء الصور المحفوظة"
   ];
