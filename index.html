@@ -191,11 +191,25 @@
           <div class="two-cols">
             <label>
               العمر من
-              <input type="number" name="ageFrom" min="18" max="60" value="18" required>
+              <div class="range-control">
+                <div class="stepper">
+                  <button type="button" data-stepper="ageFrom" data-change="-1">-</button>
+                  <input type="number" name="ageFrom" min="18" max="60" step="1" value="18" required>
+                  <button type="button" data-stepper="ageFrom" data-change="1">+</button>
+                </div>
+                <input type="range" name="ageFromRange" min="18" max="60" step="1" value="18" aria-label="العمر من">
+              </div>
             </label>
             <label>
               العمر إلى
-              <input type="number" name="ageTo" min="18" max="60" value="60" required>
+              <div class="range-control">
+                <div class="stepper">
+                  <button type="button" data-stepper="ageTo" data-change="-1">-</button>
+                  <input type="number" name="ageTo" min="18" max="60" step="1" value="60" required>
+                  <button type="button" data-stepper="ageTo" data-change="1">+</button>
+                </div>
+                <input type="range" name="ageToRange" min="18" max="60" step="1" value="60" aria-label="العمر إلى">
+              </div>
             </label>
           </div>
           <label>

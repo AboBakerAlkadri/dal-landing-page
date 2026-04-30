@@ -212,6 +212,10 @@ form.budget.addEventListener("input", () => syncRangeFromNumber("budget"));
 form.budgetRange.addEventListener("input", () => syncNumberFromRange("budget"));
 form.days.addEventListener("input", () => syncRangeFromNumber("days"));
 form.daysRange.addEventListener("input", () => syncNumberFromRange("days"));
+form.ageFrom.addEventListener("input", () => syncRangeFromNumber("ageFrom"));
+form.ageFromRange.addEventListener("input", () => syncNumberFromRange("ageFrom"));
+form.ageTo.addEventListener("input", () => syncRangeFromNumber("ageTo"));
+form.ageToRange.addEventListener("input", () => syncNumberFromRange("ageTo"));
 
 document.querySelectorAll("[data-stepper]").forEach((button) => {
   button.addEventListener("click", () => {

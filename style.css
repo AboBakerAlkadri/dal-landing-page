@@ -292,15 +292,16 @@ h1 {
   border: 0;
   border-radius: 18px;
   display: grid;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: auto auto;
   align-items: center;
+  justify-content: center;
   gap: 2px 10px;
   padding: 10px 16px;
   color: #090a0c;
   background: linear-gradient(180deg, #fff7a1 0%, #ffe01b 45%, #ffc400 100%);
   box-shadow: 0 0 16px rgba(255, 224, 27, 0.28), 0 18px 34px rgba(255, 224, 27, 0.26);
   font-weight: 900;
-  font-size: 1.02rem;
+  font-size: 1rem;
   animation: glowPulse 1.55s ease-in-out infinite;
 }
 
@@ -318,11 +319,11 @@ h1 {
 
 .campaign-glow span,
 .campaign-glow small {
-  text-align: right;
+  text-align: center;
 }
 
 .campaign-glow small {
-  font-size: 0.78rem;
+  font-size: 1rem;
   font-weight: 900;
   color: rgba(9, 10, 12, 0.72);
 }
