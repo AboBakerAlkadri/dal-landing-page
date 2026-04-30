@@ -17,6 +17,16 @@ const CAMPAIGN_IMAGES_FOLDER_NAME = "DAL Campaign Images";
 const JOBS_SHEET_ID = "PUT_YOUR_JOBS_GOOGLE_SHEET_ID_HERE";
 const JOBS_SHEET_NAME = "Jobs";
 
+function setupCampaignSheet() {
+  const sheet = SpreadsheetApp.openById(CAMPAIGN_SHEET_ID).getSheetByName(CAMPAIGN_SHEET_NAME);
+
+  if (!sheet) {
+    throw new Error("Campaign sheet not found");
+  }
+
+  ensureCampaignHeaders(sheet);
+}
+
 function doPost(e) {
   try {
     const data = JSON.parse(e.postData.contents);
