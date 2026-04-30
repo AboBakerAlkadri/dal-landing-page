@@ -135,6 +135,12 @@ function ensureCampaignHeaders(sheet) {
 
 function formatCampaignSheet(sheet, headersCount) {
   const lastRow = Math.max(sheet.getLastRow(), 1);
+  const fullRange = sheet.getRange(1, 1, lastRow, headersCount);
+
+  fullRange
+    .setBorder(true, true, true, true, true, true)
+    .setHorizontalAlignment("center")
+    .setVerticalAlignment("middle");
 
   sheet.getRange(1, 1, 1, headersCount)
     .setFontFamily("Calibri")
@@ -142,8 +148,7 @@ function formatCampaignSheet(sheet, headersCount) {
     .setFontWeight("bold")
     .setFontColor("#d60000")
     .setBackground("#ffe01b")
-    .setHorizontalAlignment("center")
-    .setVerticalAlignment("middle");
+    .setHorizontalAlignment("center");
 
   if (lastRow > 1) {
     sheet.getRange(2, 1, lastRow - 1, headersCount)
@@ -152,6 +157,7 @@ function formatCampaignSheet(sheet, headersCount) {
       .setFontWeight("normal")
       .setFontColor("#000000")
       .setBackground("#ffffff")
+      .setHorizontalAlignment("center")
       .setVerticalAlignment("middle");
   }
 
