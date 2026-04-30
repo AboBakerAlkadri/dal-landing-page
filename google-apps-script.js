@@ -24,6 +24,7 @@ function setupCampaignSheet() {
     throw new Error("Campaign sheet not found");
   }
 
+  removeDeprecatedCampaignColumns(sheet);
   ensureCampaignHeaders(sheet);
 }
 
@@ -63,6 +64,7 @@ function appendCampaignLead(data) {
     throw new Error("Campaign sheet not found");
   }
 
+  removeDeprecatedCampaignColumns(sheet);
   ensureCampaignHeaders(sheet);
   const uploadedImages = saveCampaignImages(data.imageFiles || []);
 
@@ -124,13 +126,38 @@ function ensureCampaignHeaders(sheet) {
     "اسم العميل"
   ];
 
-  if (sheet.getRange(1, 1).getValue() !== headers[0]) {
+  if (sheet.getLastRow() === 0) {
     sheet.insertRowBefore(1);
-    sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
-    sheet.setFrozenRows(1);
   }
 
+  sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+  sheet.setFrozenRows(1);
+
   formatCampaignSheet(sheet, headers.length);
+}
+
+function removeDeprecatedCampaignColumns(sheet) {
+  const deprecatedHeaders = [
+    "نوع النموذج",
+    "كود الهدف",
+    "المدينة",
+    "اللغة",
+    "أسماء الصور المختارة",
+    "أسماء الصور المحفوظة"
+  ];
+  const lastColumn = sheet.getLastColumn();
+
+  if (!lastColumn) {
+    return;
+  }
+
+  const headers = sheet.getRange(1, 1, 1, lastColumn).getValues()[0];
+
+  for (let index = headers.length - 1; index >= 0; index -= 1) {
+    if (deprecatedHeaders.includes(headers[index])) {
+      sheet.deleteColumn(index + 1);
+    }
+  }
 }
 
 function formatCampaignSheet(sheet, headersCount) {
@@ -138,7 +165,7 @@ function formatCampaignSheet(sheet, headersCount) {
   const fullRange = sheet.getRange(1, 1, lastRow, headersCount);
 
   fullRange
-    .setBorder(true, true, true, true, true, true)
+    .setBorder(true, true, true, true, true, true, "#000000", SpreadsheetApp.BorderStyle.SOLID)
     .setHorizontalAlignment("center")
     .setVerticalAlignment("middle");
 
