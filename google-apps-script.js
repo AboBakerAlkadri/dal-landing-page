@@ -49,11 +49,7 @@ function setupCampaignSheet() {
     throw new Error("Campaign sheet not found");
   }
 
-  removeDeprecatedCampaignColumns(sheet);
-  removeCampaignTypeColumn(sheet);
-  removeHeaderLikeRows(sheet);
-  ensureCampaignHeaders(sheet);
-  repairCampaignDateColumn(sheet);
+  normalizeCampaignSheet(sheet, true);
 }
 
 function authorizeDriveAccess() {
@@ -92,16 +88,14 @@ function appendCampaignLead(data) {
     throw new Error("Campaign sheet not found");
   }
 
-  removeDeprecatedCampaignColumns(sheet);
-  removeCampaignTypeColumn(sheet);
-  removeHeaderLikeRows(sheet);
-  ensureCampaignHeaders(sheet);
+  normalizeCampaignSheet(sheet, false);
   const uploadedImages = saveCampaignImages(data.imageFiles || []);
   const uploadedLogo = saveCampaignLogo(data.logoFile);
   const row = buildCampaignRow(data, uploadedImages, uploadedLogo);
+  const nextRow = sheet.getLastRow() + 1;
 
-  sheet.getRange(sheet.getLastRow() + 1, 1, 1, CAMPAIGN_HEADERS.length).setValues([row]);
-  formatCampaignSheet(sheet, CAMPAIGN_HEADERS.length);
+  sheet.getRange(nextRow, 1, 1, CAMPAIGN_HEADERS.length).setValues([row]);
+  formatCampaignSheet(sheet);
 }
 
 function buildCampaignRow(data, uploadedImages, uploadedLogo) {
@@ -135,14 +129,37 @@ function buildCampaignRow(data, uploadedImages, uploadedLogo) {
 }
 
 function ensureCampaignHeaders(sheet) {
-  if (sheet.getLastRow() === 0) {
-    sheet.insertRowBefore(1);
-  }
-
+  ensureCampaignColumnCount(sheet);
   sheet.getRange(1, 1, 1, CAMPAIGN_HEADERS.length).setValues([CAMPAIGN_HEADERS]);
   sheet.setFrozenRows(1);
+}
 
-  formatCampaignSheet(sheet, CAMPAIGN_HEADERS.length);
+function normalizeCampaignSheet(sheet, shouldFormat) {
+  removeDeprecatedCampaignColumns(sheet);
+  removeCampaignTypeColumn(sheet);
+  removeHeaderLikeRows(sheet);
+  ensureCampaignHeaders(sheet);
+  repairLegacyCampaignLeadRows(sheet);
+  trimExtraCampaignColumns(sheet);
+  if (shouldFormat) {
+    formatCampaignSheet(sheet);
+  }
+}
+
+function ensureCampaignColumnCount(sheet) {
+  const currentColumns = sheet.getMaxColumns();
+
+  if (currentColumns < CAMPAIGN_HEADERS.length) {
+    sheet.insertColumnsAfter(currentColumns, CAMPAIGN_HEADERS.length - currentColumns);
+  }
+}
+
+function trimExtraCampaignColumns(sheet) {
+  const maxColumns = sheet.getMaxColumns();
+
+  if (maxColumns > CAMPAIGN_HEADERS.length) {
+    sheet.deleteColumns(CAMPAIGN_HEADERS.length + 1, maxColumns - CAMPAIGN_HEADERS.length);
+  }
 }
 
 function removeDeprecatedCampaignColumns(sheet) {
@@ -174,20 +191,15 @@ function removeDeprecatedCampaignColumns(sheet) {
 }
 
 function removeCampaignTypeColumn(sheet) {
-  const lastRow = sheet.getLastRow();
   const lastColumn = sheet.getLastColumn();
 
-  if (!lastRow || !lastColumn) {
+  if (!lastColumn) {
     return;
   }
 
   const firstHeader = String(sheet.getRange(1, 1).getValue() || "").trim();
-  const firstColumnValues = lastRow > 1
-    ? sheet.getRange(2, 1, lastRow - 1, 1).getValues().flat().map((value) => String(value || "").trim())
-    : [];
-  const hasFormTypeValues = firstColumnValues.some((value) => value === "campaignLead" || value === "jobApplication");
 
-  if (firstHeader === "نوع النموذج" || hasFormTypeValues) {
+  if (firstHeader === "نوع النموذج") {
     sheet.deleteColumn(1);
   }
 }
@@ -222,7 +234,7 @@ function removeHeaderLikeRows(sheet) {
   }
 }
 
-function repairCampaignDateColumn(sheet) {
+function repairLegacyCampaignLeadRows(sheet) {
   const lastRow = sheet.getLastRow();
   const lastColumn = sheet.getLastColumn();
 
@@ -230,54 +242,59 @@ function repairCampaignDateColumn(sheet) {
     return;
   }
 
-  const range = sheet.getRange(2, 1, lastRow - 1, lastColumn);
-  const rows = range.getValues();
-  const knownGoalValues = [
-    "مشاهدات ووصول",
-    "تفاعل مع الفيديو والمنشور",
-    "تلقي رسائل",
-    "تلقي مكالمات",
-    "زيارة موقع إلكتروني",
-    "اختبار",
-    "test"
-  ];
+  const rowsRange = sheet.getRange(2, 1, lastRow - 1, Math.max(lastColumn, CAMPAIGN_HEADERS.length));
+  const rows = rowsRange.getValues();
+  let changed = false;
 
   const repairedRows = rows.map((row) => {
-    const firstCell = String(row[0] || "").trim();
-
-    if (isDateLikeValue(firstCell)) {
-      return row;
+    if (String(row[0] || "").trim() !== "campaignLead") {
+      return row.slice(0, CAMPAIGN_HEADERS.length);
     }
 
-    const dateIndex = row.findIndex((cell) => isDateLikeValue(cell));
-
-    if (dateIndex > 0) {
-      row[0] = row[dateIndex];
-      row[dateIndex] = "";
-      return row;
-    }
-
-    if (knownGoalValues.includes(firstCell)) {
-      row[0] = "";
-    }
-
-    return row;
+    changed = true;
+    return CAMPAIGN_HEADERS.map((header) => {
+      const legacyValue = getLegacyCampaignValue(row, header);
+      return legacyValue === undefined ? "" : legacyValue;
+    });
   });
 
-  range.setValues(repairedRows);
-  formatCampaignSheet(sheet, CAMPAIGN_HEADERS.length);
-}
-
-function isDateLikeValue(value) {
-  if (value instanceof Date) {
-    return true;
+  if (changed) {
+    sheet.getRange(2, 1, repairedRows.length, CAMPAIGN_HEADERS.length).setValues(repairedRows);
   }
-
-  const text = String(value || "").trim();
-  return /^\d{4}-\d{2}-\d{2}T/.test(text) || /^\d{4}[/-]\d{1,2}[/-]\d{1,2}/.test(text);
 }
 
-function formatCampaignSheet(sheet, headersCount) {
+function getLegacyCampaignValue(row, header) {
+  const legacyMap = {
+    "التاريخ والوقت": 1,
+    "هدف الإعلان": 2,
+    "الميزانية": 4,
+    "عدد الأيام": 5,
+    "الوصول اليومي": 6,
+    "إجمالي الوصول": 7,
+    "إجمالي التكلفة": 8,
+    "المحافظات المستهدفة": 10,
+    "العمر من": 13,
+    "العمر إلى": 14,
+    "الجنس": 15,
+    "اللغات": 17,
+    "الاهتمامات": 18,
+    "نص المنشور": 19,
+    "الوصف المختصر": 20,
+    "الوصف الطويل": 21,
+    "رقم واتساب": 22,
+    "رابط الموقع": 23,
+    "روابط الصور في Drive": 25,
+    "رابط شعار العميل في Drive": 26,
+    "رقم هاتف المعلن": 27,
+    "رقم الهاتف في الإعلان": 28,
+    "اسم العميل": 29
+  };
+
+  return row[legacyMap[header]];
+}
+
+function formatCampaignSheet(sheet) {
+  const headersCount = CAMPAIGN_HEADERS.length;
   const lastRow = Math.max(sheet.getLastRow(), 1);
   const fullRange = sheet.getRange(1, 1, lastRow, headersCount);
 

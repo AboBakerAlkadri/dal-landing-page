@@ -50,6 +50,8 @@ let previewImageUrls = [];
 let previewLogoUrl = "";
 const AGE_MIN = 18;
 const AGE_MAX = 60;
+const MAX_UPLOAD_IMAGE_SIZE = 1280;
+const IMAGE_UPLOAD_QUALITY = 0.78;
 const PRELOADER_MIN_TIME = 1400;
 const pageStartTime = Date.now();
 
@@ -710,24 +712,73 @@ async function buildPayload() {
 }
 
 function filesToBase64(fileList) {
-  return Promise.all(Array.from(fileList).map((file) => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const result = String(reader.result || "");
-        resolve({
-          name: file.name,
-          mimeType: file.type || "application/octet-stream",
-          data: result.includes(",") ? result.split(",")[1] : result
-        });
-      };
-      reader.onerror = () => reject(reader.error);
-      reader.readAsDataURL(file);
-    });
-  }));
+  return Promise.all(Array.from(fileList).map(fileToBase64));
 }
 
-function fileToBase64(file) {
+async function fileToBase64(file) {
+  if (!file) {
+    return null;
+  }
+
+  if (file.type && file.type.startsWith("image/")) {
+    try {
+      return await fileToCompressedImage(file);
+    } catch (error) {
+      return readFileAsBase64(file);
+    }
+  }
+
+  return readFileAsBase64(file);
+}
+
+function fileToCompressedImage(file) {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    const objectUrl = URL.createObjectURL(file);
+
+    image.onload = () => {
+      const scale = Math.min(MAX_UPLOAD_IMAGE_SIZE / image.width, MAX_UPLOAD_IMAGE_SIZE / image.height, 1);
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.max(Math.round(image.width * scale), 1);
+      canvas.height = Math.max(Math.round(image.height * scale), 1);
+
+      const context = canvas.getContext("2d");
+      if (!context) {
+        URL.revokeObjectURL(objectUrl);
+        reject(new Error("Canvas unavailable"));
+        return;
+      }
+
+      context.drawImage(image, 0, 0, canvas.width, canvas.height);
+      URL.revokeObjectURL(objectUrl);
+
+      canvas.toBlob((blob) => {
+        if (!blob) {
+          reject(new Error("Image compression failed"));
+          return;
+        }
+
+        readFileAsBase64(blob).then((result) => {
+          const safeName = file.name.replace(/\.[^.]+$/, "") || "dal-image";
+          resolve({
+            ...result,
+            name: `${safeName}.jpg`,
+            mimeType: "image/jpeg"
+          });
+        }).catch(reject);
+      }, "image/jpeg", IMAGE_UPLOAD_QUALITY);
+    };
+
+    image.onerror = () => {
+      URL.revokeObjectURL(objectUrl);
+      reject(new Error("Image load failed"));
+    };
+
+    image.src = objectUrl;
+  });
+}
+
+function readFileAsBase64(file) {
   if (!file) {
     return Promise.resolve(null);
   }
@@ -737,7 +788,7 @@ function fileToBase64(file) {
     reader.onload = () => {
       const result = String(reader.result || "");
       resolve({
-        name: file.name,
+        name: file.name || "dal-file",
         mimeType: file.type || "application/octet-stream",
         data: result.includes(",") ? result.split(",")[1] : result
       });
