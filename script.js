@@ -591,6 +591,19 @@ function calculateCampaignEstimate() {
   const days = Number(form.days.value) || 0;
   const goalType = getSelectedGoalType();
 
+  if (!goalType) {
+    return {
+      dailyReach: "",
+      totalReach: 0,
+      engagement: "",
+      dailyReachText: "",
+      totalReachText: "0",
+      engagementText: "",
+      secondaryText: "",
+      totalCost: budget
+    };
+  }
+
   if (CAMPAIGN_PACKAGE_TABLES[goalType]) {
     return calculatePackageEstimate(budget, goalType);
   }
