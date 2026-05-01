@@ -54,7 +54,8 @@ const MAX_UPLOAD_IMAGE_SIZE = 1280;
 const IMAGE_UPLOAD_QUALITY = 0.78;
 const PRELOADER_MIN_TIME = 1400;
 const pageStartTime = Date.now();
-const REACH_PACKAGES = [
+const CAMPAIGN_PACKAGE_TABLES = {
+  reach: [
   {
     days: 5,
     budget: 25,
@@ -79,9 +80,34 @@ const REACH_PACKAGES = [
     engagementMin: 1200,
     engagementMax: 2000
   }
-].map((packageItem) => ({
-  ...packageItem
-}));
+  ],
+  engagement: [
+    {
+      days: 5,
+      budget: 25,
+      reachMin: 5000,
+      reachMax: 10000,
+      engagementMin: 100,
+      engagementMax: 300
+    },
+    {
+      days: 8,
+      budget: 45,
+      reachMin: 10000,
+      reachMax: 25000,
+      engagementMin: 250,
+      engagementMax: 700
+    },
+    {
+      days: 15,
+      budget: 100,
+      reachMin: 25000,
+      reachMax: 70000,
+      engagementMin: 1200,
+      engagementMax: 2000
+    }
+  ]
+};
 
 const SYRIA_LOCATIONS = {
   "دمشق": ["دمشق", "المزة", "المالكي", "أبو رمانة", "كفرسوسة", "الميدان", "برزة", "جرمانا"],
@@ -256,7 +282,7 @@ form.addEventListener("input", () => {
   updatePreview();
 });
 
-form.campaignGoal.addEventListener("change", updateGoalFields);
+form.campaignGoal.addEventListener("change", handleCampaignGoalSelection);
 form.adImages.addEventListener("change", updatePreviewImage);
 form.companyLogo.addEventListener("change", updatePreviewLogo);
 form.budget.addEventListener("blur", () => applyBudgetRules());
@@ -278,7 +304,7 @@ document.querySelectorAll("[data-stepper]").forEach((button) => {
 });
 
 window.handleCampaignGoalChange = function handleCampaignGoalChange() {
-  updateGoalFields();
+  handleCampaignGoalSelection();
 };
 
 form.addEventListener("submit", async (event) => {
@@ -467,8 +493,8 @@ function calculateCampaignEstimate() {
   const days = Number(form.days.value) || 0;
   const goalType = getSelectedGoalType();
 
-  if (goalType === "reach") {
-    return calculateReachEstimate(budget, days);
+  if (CAMPAIGN_PACKAGE_TABLES[goalType]) {
+    return calculatePackageEstimate(budget, goalType);
   }
 
   const dailyBudget = days > 0 ? budget / days : 0;
@@ -486,9 +512,9 @@ function calculateCampaignEstimate() {
   };
 }
 
-function calculateReachEstimate(budget) {
+function calculatePackageEstimate(budget, goalType) {
   const safeBudget = Math.max(budget, MIN_CAMPAIGN_BUDGET);
-  const packageValues = getReachPackageValues(safeBudget);
+  const packageValues = getCampaignPackageValues(safeBudget, goalType);
   const totalReachMin = roundReachValue(packageValues.reachMin);
   const totalReachMax = roundReachValue(packageValues.reachMax);
   const engagementMin = roundEngagementValue(packageValues.engagementMin);
@@ -505,8 +531,8 @@ function calculateReachEstimate(budget) {
   };
 }
 
-function getReachPackageValues(budget) {
-  const packages = REACH_PACKAGES;
+function getCampaignPackageValues(budget, goalType) {
+  const packages = CAMPAIGN_PACKAGE_TABLES[goalType] || CAMPAIGN_PACKAGE_TABLES.reach;
 
   if (budget <= packages[0].budget) {
     const multiplier = budget / packages[0].budget;
@@ -582,6 +608,19 @@ function updateGoalFields() {
   if (previewImageUrls.length) {
     renderPreviewCarousel();
   }
+}
+
+function handleCampaignGoalSelection() {
+  setCampaignDefaults();
+  updateGoalFields();
+  updatePreview();
+}
+
+function setCampaignDefaults() {
+  form.budget.value = 25;
+  form.budgetRange.value = 25;
+  form.days.value = 5;
+  form.daysRange.value = 5;
 }
 
 function getGoalPreviewConfig() {
