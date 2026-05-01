@@ -50,6 +50,7 @@ let previewLogoUrl = "";
 const AGE_MIN = 18;
 const AGE_MAX = 60;
 const MIN_CAMPAIGN_BUDGET = 10;
+const MIN_CAMPAIGN_DAYS = 5;
 const MAX_UPLOAD_IMAGE_SIZE = 1280;
 const IMAGE_UPLOAD_QUALITY = 0.78;
 const PRELOADER_MIN_TIME = 1400;
@@ -387,6 +388,14 @@ function validateCurrentStep() {
 
     if (budget % 5 !== 0) {
       applyBudgetRules();
+    }
+
+    const days = Number(form.days.value) || 0;
+
+    if (days < MIN_CAMPAIGN_DAYS) {
+      showMessage("أقل مدة للحملة هي 5 أيام.", "error");
+      form.days.focus();
+      return false;
     }
   }
 
