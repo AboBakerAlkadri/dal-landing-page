@@ -52,6 +52,7 @@ function setupCampaignSheet() {
   removeDeprecatedCampaignColumns(sheet);
   removeHeaderLikeRows(sheet);
   ensureCampaignHeaders(sheet);
+  repairCampaignDateColumn(sheet);
 }
 
 function authorizeDriveAccess() {
@@ -198,6 +199,61 @@ function removeHeaderLikeRows(sheet) {
       sheet.deleteRow(index + 2);
     }
   }
+}
+
+function repairCampaignDateColumn(sheet) {
+  const lastRow = sheet.getLastRow();
+  const lastColumn = sheet.getLastColumn();
+
+  if (lastRow <= 1 || !lastColumn) {
+    return;
+  }
+
+  const range = sheet.getRange(2, 1, lastRow - 1, lastColumn);
+  const rows = range.getValues();
+  const knownGoalValues = [
+    "مشاهدات ووصول",
+    "تفاعل مع الفيديو والمنشور",
+    "تلقي رسائل",
+    "تلقي مكالمات",
+    "زيارة موقع إلكتروني",
+    "اختبار",
+    "test"
+  ];
+
+  const repairedRows = rows.map((row) => {
+    const firstCell = String(row[0] || "").trim();
+
+    if (isDateLikeValue(firstCell)) {
+      return row;
+    }
+
+    const dateIndex = row.findIndex((cell) => isDateLikeValue(cell));
+
+    if (dateIndex > 0) {
+      row[0] = row[dateIndex];
+      row[dateIndex] = "";
+      return row;
+    }
+
+    if (knownGoalValues.includes(firstCell)) {
+      row[0] = "";
+    }
+
+    return row;
+  });
+
+  range.setValues(repairedRows);
+  formatCampaignSheet(sheet, CAMPAIGN_HEADERS.length);
+}
+
+function isDateLikeValue(value) {
+  if (value instanceof Date) {
+    return true;
+  }
+
+  const text = String(value || "").trim();
+  return /^\d{4}-\d{2}-\d{2}T/.test(text) || /^\d{4}[/-]\d{1,2}[/-]\d{1,2}/.test(text);
 }
 
 function formatCampaignSheet(sheet, headersCount) {
