@@ -50,6 +50,7 @@ function setupCampaignSheet() {
   }
 
   removeDeprecatedCampaignColumns(sheet);
+  removeCampaignTypeColumn(sheet);
   removeHeaderLikeRows(sheet);
   ensureCampaignHeaders(sheet);
   repairCampaignDateColumn(sheet);
@@ -92,6 +93,7 @@ function appendCampaignLead(data) {
   }
 
   removeDeprecatedCampaignColumns(sheet);
+  removeCampaignTypeColumn(sheet);
   removeHeaderLikeRows(sheet);
   ensureCampaignHeaders(sheet);
   const uploadedImages = saveCampaignImages(data.imageFiles || []);
@@ -168,6 +170,25 @@ function removeDeprecatedCampaignColumns(sheet) {
     if (deprecatedHeaders.includes(headers[index])) {
       sheet.deleteColumn(index + 1);
     }
+  }
+}
+
+function removeCampaignTypeColumn(sheet) {
+  const lastRow = sheet.getLastRow();
+  const lastColumn = sheet.getLastColumn();
+
+  if (!lastRow || !lastColumn) {
+    return;
+  }
+
+  const firstHeader = String(sheet.getRange(1, 1).getValue() || "").trim();
+  const firstColumnValues = lastRow > 1
+    ? sheet.getRange(2, 1, lastRow - 1, 1).getValues().flat().map((value) => String(value || "").trim())
+    : [];
+  const hasFormTypeValues = firstColumnValues.some((value) => value === "campaignLead" || value === "jobApplication");
+
+  if (firstHeader === "نوع النموذج" || hasFormTypeValues) {
+    sheet.deleteColumn(1);
   }
 }
 

@@ -678,7 +678,6 @@ async function buildPayload() {
   const selectedGovernorates = getSelectedGovernorates();
 
   return {
-    formType: "campaignLead",
     submittedAt: new Date().toISOString(),
     campaignGoal: getSelectedGoalLabel(),
     campaignGoalType: getSelectedGoalType(),
