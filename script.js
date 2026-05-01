@@ -557,11 +557,13 @@ function normalizeUrl(value) {
 function updateEstimate() {
   const estimate = calculateCampaignEstimate();
   const metricLabels = getEstimateMetricLabels();
+  const primaryMetricRow = document.getElementById("primaryMetricValue").closest("div");
   const secondaryMetricRow = document.getElementById("secondaryMetricRow");
 
   document.getElementById("totalReach").textContent = estimate.totalReachText;
   document.getElementById("primaryMetricLabel").textContent = metricLabels.primary;
   document.getElementById("primaryMetricValue").textContent = estimate.engagementText;
+  primaryMetricRow.hidden = !estimate.engagementText;
   document.getElementById("secondaryMetricLabel").textContent = metricLabels.secondary;
   document.getElementById("secondaryMetricValue").textContent = estimate.secondaryText || "";
   secondaryMetricRow.hidden = !estimate.secondaryText;
@@ -622,10 +624,10 @@ function calculatePackageEstimate(budget, goalType) {
   return {
     dailyReach: "",
     totalReach: `${totalReachMin} - ${totalReachMax}`,
-    engagement: `${engagementMin} - ${engagementMax}`,
+    engagement: goalType === "reach" ? "" : `${engagementMin} - ${engagementMax}`,
     dailyReachText: "",
     totalReachText: formatRange(totalReachMin, totalReachMax),
-    engagementText: formatRange(engagementMin, engagementMax),
+    engagementText: goalType === "reach" ? "" : formatRange(engagementMin, engagementMax),
     secondaryText: secondaryMin && secondaryMax ? formatRange(secondaryMin, secondaryMax) : "",
     totalCost: safeBudget
   };
