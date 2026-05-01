@@ -296,7 +296,6 @@ function appendJobApplication(data) {
   }
 
   sheet.appendRow([
-    data.formType || "jobApplication",
     data.submittedAt || new Date().toISOString(),
     data.fullName || "",
     data.customerId || "",
