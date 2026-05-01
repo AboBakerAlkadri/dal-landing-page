@@ -21,7 +21,7 @@ const CAMPAIGN_HEADERS = [
   "الوصول اليومي",
   "إجمالي الوصول",
   "إجمالي التكلفة",
-  "المحافظات المستهدفة",
+  "المحافظة",
   "العمر من",
   "العمر إلى",
   "الجنس",
@@ -135,7 +135,7 @@ function buildCampaignRow(data, uploadedImages, uploadedLogo) {
     "الوصول اليومي": data.dailyReach || "",
     "إجمالي الوصول": data.totalReach || "",
     "إجمالي التكلفة": data.totalCost || "",
-    "المحافظات المستهدفة": data.governorates || data.regions || data.governorate || "",
+    "المحافظة": data.governorates || data.governorate || "",
     "العمر من": data.ageFrom || "",
     "العمر إلى": data.ageTo || "",
     "الجنس": data.gender || "",
@@ -283,7 +283,7 @@ function findHeaderIndex(headers, header) {
 
 function getHeaderAliases(header) {
   const aliases = {
-    "المحافظات المستهدفة": ["المحافظات المستهدفة", "المحافظات", "المحافظة", "المناطق"],
+    "المحافظة": ["المحافظة", "المحافظات المستهدفة", "المحافظات", "المناطق"],
     "اللغات": ["اللغات", "اللغة"],
     "روابط الصور في Drive": ["روابط الصور في Drive", "أسماء الصور المختارة", "أسماء الصور المحفوظة"],
     "رابط شعار العميل في Drive": ["رابط شعار العميل في Drive", "اسم ملف الشعار"],
@@ -447,7 +447,7 @@ function getLegacyCampaignValue(row, header) {
     "الوصول اليومي": 6,
     "إجمالي الوصول": 7,
     "إجمالي التكلفة": 8,
-    "المحافظات المستهدفة": 10,
+    "المحافظة": 10,
     "العمر من": 13,
     "العمر إلى": 14,
     "الجنس": 15,
