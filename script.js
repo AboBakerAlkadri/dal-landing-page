@@ -120,10 +120,6 @@ const GOAL_PREVIEW_CONFIG = {
   calls: {
     cta: "اتصال الآن",
     tone: "calls"
-  },
-  traffic: {
-    cta: "زيارة الموقع",
-    tone: "traffic"
   }
 };
 
@@ -579,13 +575,6 @@ function updateGoalFields() {
 function getGoalPreviewConfig() {
   const goalType = getSelectedGoalType();
 
-  if (goalType === "traffic" && isAppDestination(form.destinationUrl.value)) {
-    return {
-      cta: "تثبيت الآن",
-      tone: "traffic"
-    };
-  }
-
   return GOAL_PREVIEW_CONFIG[goalType] || {
     cta: "اختر هدف الحملة",
     tone: "default"
@@ -598,11 +587,6 @@ function getSelectedGoalType() {
 
 function getSelectedGoalLabel() {
   return form.campaignGoal.selectedOptions[0]?.dataset.label || "";
-}
-
-function isAppDestination(url) {
-  const value = url.trim().toLowerCase();
-  return value.includes("play.google.com") || value.includes("apps.apple.com") || value.includes("app");
 }
 
 function updatePreviewImage() {
