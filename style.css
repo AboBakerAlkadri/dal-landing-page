@@ -857,6 +857,36 @@ input[type="range"] {
   font-weight: 800;
 }
 
+.trust-counter {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 10px;
+  margin: 14px 0;
+  padding: 14px 16px;
+  border: 1px solid rgba(255, 224, 27, 0.28);
+  border-radius: 16px;
+  color: var(--text);
+  background: rgba(255, 224, 27, 0.08);
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.22);
+}
+
+.trust-counter i,
+.trust-counter strong {
+  color: var(--yellow);
+}
+
+.trust-counter span {
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.trust-counter strong {
+  font-size: 1.25rem;
+  font-weight: 950;
+}
+
 .estimate-card {
   display: grid;
   gap: 10px;

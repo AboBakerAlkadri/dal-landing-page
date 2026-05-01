@@ -42,18 +42,42 @@ const JOBS_SHEET_ID = "PUT_YOUR_JOBS_GOOGLE_SHEET_ID_HERE";
 const JOBS_SHEET_NAME = "Jobs";
 
 function setupCampaignSheet() {
+  // تنبيه: هذه الدالة تمسح بيانات الاختبار القديمة وتعيد إنشاء العناوين الصحيحة فقط.
   const sheet = SpreadsheetApp.openById(CAMPAIGN_SHEET_ID).getSheetByName(CAMPAIGN_SHEET_NAME);
 
   if (!sheet) {
     throw new Error("Campaign sheet not found");
   }
 
-  normalizeCampaignSheet(sheet, true);
+  resetCampaignSheet();
 }
 
 function authorizeDriveAccess() {
   const folder = getOrCreateFolder(CAMPAIGN_IMAGES_FOLDER_NAME);
   return folder.getUrl();
+}
+
+function doGet(e) {
+  try {
+    const action = e && e.parameter ? e.parameter.action : "";
+
+    if (action === "campaignStats") {
+      return jsonResponse({
+        success: true,
+        campaignRequests: getCampaignRequestsCount()
+      });
+    }
+
+    return jsonResponse({
+      success: true,
+      message: "DAL Campaign API is running"
+    });
+  } catch (error) {
+    return jsonResponse({
+      success: false,
+      message: error.message
+    });
+  }
 }
 
 function doPost(e) {
@@ -67,16 +91,15 @@ function doPost(e) {
       appendCampaignLead(data);
     }
 
-    return ContentService
-      .createTextOutput(JSON.stringify({ success: true }))
-      .setMimeType(ContentService.MimeType.JSON);
+    return jsonResponse({
+      success: true,
+      campaignRequests: getCampaignRequestsCount()
+    });
   } catch (error) {
-    return ContentService
-      .createTextOutput(JSON.stringify({
-        success: false,
-        message: error.message
-      }))
-      .setMimeType(ContentService.MimeType.JSON);
+    return jsonResponse({
+      success: false,
+      message: error.message
+    });
   }
 }
 
@@ -87,7 +110,7 @@ function appendCampaignLead(data) {
     throw new Error("Campaign sheet not found");
   }
 
-  normalizeCampaignSheet(sheet, false);
+  ensureCleanCampaignSheetStructure(sheet);
   const uploadedImages = saveCampaignImages(data.imageFiles || []);
   const uploadedLogo = saveCampaignLogo(data.logoFile);
   const row = buildCampaignRow(data, uploadedImages, uploadedLogo);
@@ -95,6 +118,12 @@ function appendCampaignLead(data) {
 
   sheet.getRange(nextRow, 1, 1, CAMPAIGN_HEADERS.length).setValues([row]);
   formatCampaignSheet(sheet);
+}
+
+function jsonResponse(payload) {
+  return ContentService
+    .createTextOutput(JSON.stringify(payload))
+    .setMimeType(ContentService.MimeType.JSON);
 }
 
 function buildCampaignRow(data, uploadedImages, uploadedLogo) {
@@ -132,20 +161,82 @@ function ensureCampaignHeaders(sheet) {
   sheet.setFrozenRows(1);
 }
 
-function normalizeCampaignSheet(sheet, shouldFormat) {
-  const normalizedRows = getNormalizedCampaignRows(sheet);
-
+function resetCampaignSheet() {
+  const sheet = SpreadsheetApp.openById(CAMPAIGN_SHEET_ID).getSheetByName(CAMPAIGN_SHEET_NAME);
+  if (!sheet) {
+    throw new Error("Campaign sheet not found");
+  }
   sheet.clear();
-  ensureCampaignHeaders(sheet);
+  ensureCleanCampaignSheetStructure(sheet);
+  formatCampaignSheet(sheet);
+}
 
-  if (normalizedRows.length) {
-    sheet.getRange(2, 1, normalizedRows.length, CAMPAIGN_HEADERS.length).setValues(normalizedRows);
+function ensureCleanCampaignSheetStructure(sheet) {
+  if (shouldResetCorruptedCampaignSheet(sheet)) {
+    sheet.clear();
   }
 
+  ensureCampaignColumnCount(sheet);
   trimExtraCampaignColumns(sheet);
-  if (shouldFormat) {
-    formatCampaignSheet(sheet);
+  ensureCampaignHeaders(sheet);
+  removeHeaderLikeRows(sheet);
+}
+
+function shouldResetCorruptedCampaignSheet(sheet) {
+  const lastRow = sheet.getLastRow();
+  const lastColumn = sheet.getLastColumn();
+
+  if (!lastRow || !lastColumn) {
+    return false;
   }
+
+  const headers = sheet.getRange(1, 1, 1, lastColumn).getValues()[0].map((header) => normalizeHeaderName(header));
+  const expectedHeaders = CAMPAIGN_HEADERS.map((header) => normalizeHeaderName(header));
+  const deprecatedHeaders = [
+    "نوع النموذج",
+    "كود الهدف",
+    "المدينة",
+    "المحافظة",
+    "المحافظات",
+    "المناطق",
+    "الاهتمامات",
+    "أسماء الصور المختارة",
+    "أسماء الصور المحفوظة",
+    "اسم ملف الشعار"
+  ].map((header) => normalizeHeaderName(header));
+
+  const hasDeprecatedHeader = headers.some((header) => deprecatedHeaders.includes(header));
+  const hasWrongFirstHeaders = expectedHeaders.some((header, index) => headers[index] && headers[index] !== header);
+
+  if (hasDeprecatedHeader || hasWrongFirstHeaders) {
+    return true;
+  }
+
+  if (lastRow <= 1) {
+    return false;
+  }
+
+  const sampleRows = sheet.getRange(2, 1, Math.min(lastRow - 1, 20), lastColumn).getValues();
+  return sampleRows.some((row) => {
+    const firstCell = String(row[0] || "").trim();
+    return firstCell === "campaignLead" || firstCell === "jobApplication" || isHeaderLikeRow(row);
+  });
+}
+
+function getCampaignRequestsCount() {
+  const sheet = SpreadsheetApp.openById(CAMPAIGN_SHEET_ID).getSheetByName(CAMPAIGN_SHEET_NAME);
+  if (!sheet) {
+    return 0;
+  }
+
+  ensureCleanCampaignSheetStructure(sheet);
+  const lastRow = sheet.getLastRow();
+  if (lastRow <= 1) {
+    return 0;
+  }
+
+  const rows = sheet.getRange(2, 1, lastRow - 1, CAMPAIGN_HEADERS.length).getValues();
+  return rows.filter((row) => !isEmptyRow(row) && !isHeaderLikeRow(row)).length;
 }
 
 function getNormalizedCampaignRows(sheet) {

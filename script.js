@@ -43,6 +43,7 @@ const previewCta = document.getElementById("previewCta");
 const previewLogo = document.getElementById("previewLogo");
 const governorateOptions = document.getElementById("governorateOptions");
 const languageSummary = document.getElementById("languageSummary");
+const campaignRequestsCount = document.getElementById("campaignRequestsCount");
 
 let currentStep = 1;
 let previewImageUrls = [];
@@ -246,6 +247,7 @@ document.querySelectorAll("[data-link]").forEach((element) => {
 });
 
 populateGovernorates();
+loadCampaignRequestsCount();
 
 if (openCampaign) {
   openCampaign.addEventListener("click", () => {
@@ -315,6 +317,34 @@ function closeIframe() {
 
 function hideQuickContactMenu() {
   quickContactMenu.hidden = true;
+}
+
+async function loadCampaignRequestsCount() {
+  if (!campaignRequestsCount || GOOGLE_SCRIPT_URL.includes("PUT_YOUR")) {
+    return;
+  }
+
+  try {
+    const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=campaignStats&ts=${Date.now()}`, {
+      method: "GET",
+      cache: "no-store"
+    });
+    const result = await response.json();
+
+    if (response.ok && result.success) {
+      updateCampaignRequestsCount(result.campaignRequests);
+    }
+  } catch (error) {
+    campaignRequestsCount.textContent = "--";
+  }
+}
+
+function updateCampaignRequestsCount(value) {
+  if (!campaignRequestsCount || value === undefined || value === null) {
+    return;
+  }
+
+  campaignRequestsCount.textContent = `+${formatNumber(Number(value) || 0)}`;
 }
 
 function updateStep() {
@@ -403,6 +433,7 @@ form.addEventListener("submit", async (event) => {
       throw new Error(result.message || "Send failed");
     }
 
+    updateCampaignRequestsCount(result.campaignRequests);
     form.reset();
     clearSavedFormState();
     setDefaultLanguages();
@@ -413,7 +444,6 @@ form.addEventListener("submit", async (event) => {
     updatePreviewImage();
     updatePreviewLogo();
     normalizeAgeRange();
-    updateOtherInterestsField();
     updateLanguageSummary();
     updateStep();
     alert("تم إرسال طلبك بنجاح، سيتواصل معك فريق دال قريبًا.");
