@@ -148,11 +148,12 @@
               <div class="range-control">
                 <div class="stepper">
                   <button type="button" data-stepper="budget" data-change="-1">-</button>
-                  <input type="number" name="budget" min="1" max="10000" step="1" value="50" required>
+                  <input type="number" name="budget" min="10" max="10000" step="1" value="50" required>
                   <button type="button" data-stepper="budget" data-change="1">+</button>
                 </div>
-                <input type="range" name="budgetRange" min="1" max="10000" step="1" value="50" aria-label="الميزانية بالدولار">
+                <input type="range" name="budgetRange" min="10" max="10000" step="1" value="50" aria-label="الميزانية بالدولار">
               </div>
+              <small class="field-note">أقل ميزانية للحملة هي 10$.</small>
             </label>
             <label>
               عدد الأيام
@@ -339,6 +340,6 @@
     </section>
   </div>
 
-  <script src="script.js?v=20260501-reach-packages"></script>
+  <script src="script.js?v=20260501-budget-min-10"></script>
 </body>
 </html>

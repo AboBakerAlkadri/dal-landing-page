@@ -49,6 +49,7 @@ let previewImageUrls = [];
 let previewLogoUrl = "";
 const AGE_MIN = 18;
 const AGE_MAX = 60;
+const MIN_CAMPAIGN_BUDGET = 10;
 const MAX_UPLOAD_IMAGE_SIZE = 1280;
 const IMAGE_UPLOAD_QUALITY = 0.78;
 const PRELOADER_MIN_TIME = 1400;
@@ -355,6 +356,13 @@ function validateCurrentStep() {
   }
 
   if (currentStep === 1) {
+    const budget = Number(form.budget.value) || 0;
+
+    if (budget < MIN_CAMPAIGN_BUDGET) {
+      showMessage("أقل ميزانية للحملة هي 10$.", "error");
+      form.budget.focus();
+      return false;
+    }
   }
 
   const ageFrom = Number(form.ageFrom.value);
@@ -482,7 +490,8 @@ function calculateCampaignEstimate() {
 
 function calculateReachEstimate(budget, days) {
   const safeDays = Math.max(days, 1);
-  const dailyBudget = Math.max(budget / safeDays, 5);
+  const safeBudget = Math.max(budget, MIN_CAMPAIGN_BUDGET);
+  const dailyBudget = safeBudget / safeDays;
   const dailyValues = getReachDailyValues(dailyBudget);
   const dailyReachMin = Math.round(dailyValues.reachMin);
   const dailyReachMax = Math.round(dailyValues.reachMax);
@@ -498,7 +507,7 @@ function calculateReachEstimate(budget, days) {
     dailyReachText: formatRange(dailyReachMin, dailyReachMax),
     totalReachText: formatRange(totalReachMin, totalReachMax),
     engagementText: formatRange(engagementMin, engagementMax),
-    totalCost: budget
+    totalCost: safeBudget
   };
 }
 
@@ -506,11 +515,12 @@ function getReachDailyValues(dailyBudget) {
   const packages = REACH_PACKAGES;
 
   if (dailyBudget <= packages[0].dailyBudget) {
+    const multiplier = dailyBudget / packages[0].dailyBudget;
     return {
-      reachMin: packages[0].dailyReachMin,
-      reachMax: packages[0].dailyReachMax,
-      engagementMin: packages[0].dailyEngagementMin,
-      engagementMax: packages[0].dailyEngagementMax
+      reachMin: packages[0].dailyReachMin * multiplier,
+      reachMax: packages[0].dailyReachMax * multiplier,
+      engagementMin: packages[0].dailyEngagementMin * multiplier,
+      engagementMax: packages[0].dailyEngagementMax * multiplier
     };
   }
 
