@@ -107,6 +107,70 @@ const CAMPAIGN_PACKAGE_TABLES = {
       engagementMin: 1200,
       engagementMax: 2000
     }
+  ],
+  messages: [
+    {
+      days: 5,
+      budget: 25,
+      reachMin: 45000,
+      reachMax: 90000,
+      engagementMin: 15,
+      engagementMax: 35,
+      secondaryMin: 25,
+      secondaryMax: 45
+    },
+    {
+      days: 8,
+      budget: 45,
+      reachMin: 280000,
+      reachMax: 390000,
+      engagementMin: 60,
+      engagementMax: 75,
+      secondaryMin: 60,
+      secondaryMax: 95
+    },
+    {
+      days: 15,
+      budget: 100,
+      reachMin: 580000,
+      reachMax: 800000,
+      engagementMin: 95,
+      engagementMax: 160,
+      secondaryMin: 130,
+      secondaryMax: 210
+    }
+  ],
+  calls: [
+    {
+      days: 5,
+      budget: 25,
+      reachMin: 45000,
+      reachMax: 90000,
+      engagementMin: 15,
+      engagementMax: 35,
+      secondaryMin: 25,
+      secondaryMax: 45
+    },
+    {
+      days: 8,
+      budget: 45,
+      reachMin: 280000,
+      reachMax: 390000,
+      engagementMin: 60,
+      engagementMax: 75,
+      secondaryMin: 60,
+      secondaryMax: 95
+    },
+    {
+      days: 15,
+      budget: 100,
+      reachMin: 580000,
+      reachMax: 800000,
+      engagementMin: 95,
+      engagementMax: 160,
+      secondaryMin: 130,
+      secondaryMax: 210
+    }
   ]
 };
 
@@ -491,10 +555,32 @@ function normalizeUrl(value) {
 
 function updateEstimate() {
   const estimate = calculateCampaignEstimate();
+  const metricLabels = getEstimateMetricLabels();
+  const secondaryMetricRow = document.getElementById("secondaryMetricRow");
 
   document.getElementById("totalReach").textContent = estimate.totalReachText;
-  document.getElementById("estimatedEngagement").textContent = estimate.engagementText;
+  document.getElementById("primaryMetricLabel").textContent = metricLabels.primary;
+  document.getElementById("primaryMetricValue").textContent = estimate.engagementText;
+  document.getElementById("secondaryMetricLabel").textContent = metricLabels.secondary;
+  document.getElementById("secondaryMetricValue").textContent = estimate.secondaryText || "";
+  secondaryMetricRow.hidden = !estimate.secondaryText;
   document.getElementById("totalCost").textContent = `$${formatNumber(estimate.totalCost)}`;
+}
+
+function getEstimateMetricLabels() {
+  const goalType = getSelectedGoalType();
+
+  if (goalType === "messages" || goalType === "calls") {
+    return {
+      primary: "الاتصالات المتوقعة",
+      secondary: "الرسائل المتوقعة"
+    };
+  }
+
+  return {
+    primary: "التفاعلات المتوقعة",
+    secondary: "الرسائل المتوقعة"
+  };
 }
 
 function calculateCampaignEstimate() {
@@ -517,6 +603,7 @@ function calculateCampaignEstimate() {
     dailyReachText: formatNumber(dailyReach),
     totalReachText: formatNumber(totalReach),
     engagementText: formatNumber(Math.round(totalReach * 0.003)),
+    secondaryText: "",
     totalCost: budget
   };
 }
@@ -526,8 +613,10 @@ function calculatePackageEstimate(budget, goalType) {
   const packageValues = getCampaignPackageValues(safeBudget, goalType);
   const totalReachMin = roundReachValue(packageValues.reachMin);
   const totalReachMax = roundReachValue(packageValues.reachMax);
-  const engagementMin = roundEngagementValue(packageValues.engagementMin);
-  const engagementMax = roundEngagementValue(packageValues.engagementMax);
+  const engagementMin = roundMetricValue(packageValues.engagementMin);
+  const engagementMax = roundMetricValue(packageValues.engagementMax);
+  const secondaryMin = packageValues.secondaryMin ? roundMetricValue(packageValues.secondaryMin) : 0;
+  const secondaryMax = packageValues.secondaryMax ? roundMetricValue(packageValues.secondaryMax) : 0;
 
   return {
     dailyReach: "",
@@ -536,6 +625,7 @@ function calculatePackageEstimate(budget, goalType) {
     dailyReachText: "",
     totalReachText: formatRange(totalReachMin, totalReachMax),
     engagementText: formatRange(engagementMin, engagementMax),
+    secondaryText: secondaryMin && secondaryMax ? formatRange(secondaryMin, secondaryMax) : "",
     totalCost: safeBudget
   };
 }
@@ -549,7 +639,9 @@ function getCampaignPackageValues(budget, goalType) {
       reachMin: packages[0].reachMin * multiplier,
       reachMax: packages[0].reachMax * multiplier,
       engagementMin: packages[0].engagementMin * multiplier,
-      engagementMax: packages[0].engagementMax * multiplier
+      engagementMax: packages[0].engagementMax * multiplier,
+      secondaryMin: (packages[0].secondaryMin || 0) * multiplier,
+      secondaryMax: (packages[0].secondaryMax || 0) * multiplier
     };
   }
 
@@ -563,7 +655,9 @@ function getCampaignPackageValues(budget, goalType) {
         reachMin: interpolate(start.reachMin, end.reachMin, ratio),
         reachMax: interpolate(start.reachMax, end.reachMax, ratio),
         engagementMin: interpolate(start.engagementMin, end.engagementMin, ratio),
-        engagementMax: interpolate(start.engagementMax, end.engagementMax, ratio)
+        engagementMax: interpolate(start.engagementMax, end.engagementMax, ratio),
+        secondaryMin: interpolate(start.secondaryMin || 0, end.secondaryMin || 0, ratio),
+        secondaryMax: interpolate(start.secondaryMax || 0, end.secondaryMax || 0, ratio)
       };
     }
   }
@@ -574,7 +668,9 @@ function getCampaignPackageValues(budget, goalType) {
     reachMin: lastPackage.reachMin * multiplier,
     reachMax: lastPackage.reachMax * multiplier,
     engagementMin: lastPackage.engagementMin * multiplier,
-    engagementMax: lastPackage.engagementMax * multiplier
+    engagementMax: lastPackage.engagementMax * multiplier,
+    secondaryMin: (lastPackage.secondaryMin || 0) * multiplier,
+    secondaryMax: (lastPackage.secondaryMax || 0) * multiplier
   };
 }
 
@@ -586,8 +682,9 @@ function roundReachValue(value) {
   return Math.round(value / 1000) * 1000;
 }
 
-function roundEngagementValue(value) {
-  return Math.round(value / 10) * 10;
+function roundMetricValue(value) {
+  const step = value < 100 ? 5 : 10;
+  return Math.round(value / step) * step;
 }
 
 function updatePreview() {

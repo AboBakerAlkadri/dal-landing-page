@@ -746,6 +746,17 @@ input[type="range"] {
 .two-cols {
   display: grid;
   gap: 10px;
+  align-items: start;
+}
+
+.two-cols > label {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.two-cols > label .range-control {
+  margin-top: 8px;
 }
 
 .audience-picker {
