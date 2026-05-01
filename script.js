@@ -80,12 +80,7 @@ const REACH_PACKAGES = [
     engagementMax: 2000
   }
 ].map((packageItem) => ({
-  ...packageItem,
-  dailyBudget: packageItem.budget / packageItem.days,
-  dailyReachMin: packageItem.reachMin / packageItem.days,
-  dailyReachMax: packageItem.reachMax / packageItem.days,
-  dailyEngagementMin: packageItem.engagementMin / packageItem.days,
-  dailyEngagementMax: packageItem.engagementMax / packageItem.days
+  ...packageItem
 }));
 
 const SYRIA_LOCATIONS = {
@@ -264,7 +259,7 @@ form.addEventListener("input", () => {
 form.campaignGoal.addEventListener("change", updateGoalFields);
 form.adImages.addEventListener("change", updatePreviewImage);
 form.companyLogo.addEventListener("change", updatePreviewLogo);
-form.budget.addEventListener("input", () => syncRangeFromNumber("budget"));
+form.budget.addEventListener("blur", () => applyBudgetRules());
 form.budgetRange.addEventListener("input", () => syncNumberFromRange("budget"));
 form.days.addEventListener("input", () => syncRangeFromNumber("days"));
 form.daysRange.addEventListener("input", () => syncNumberFromRange("days"));
@@ -363,6 +358,10 @@ function validateCurrentStep() {
       form.budget.focus();
       return false;
     }
+
+    if (budget % 5 !== 0) {
+      applyBudgetRules();
+    }
   }
 
   const ageFrom = Number(form.ageFrom.value);
@@ -458,7 +457,6 @@ function normalizeUrl(value) {
 function updateEstimate() {
   const estimate = calculateCampaignEstimate();
 
-  document.getElementById("dailyReach").textContent = estimate.dailyReachText;
   document.getElementById("totalReach").textContent = estimate.totalReachText;
   document.getElementById("estimatedEngagement").textContent = estimate.engagementText;
   document.getElementById("totalCost").textContent = `$${formatNumber(estimate.totalCost)}`;
@@ -491,18 +489,16 @@ function calculateCampaignEstimate() {
 function calculateReachEstimate(budget) {
   const safeBudget = Math.max(budget, MIN_CAMPAIGN_BUDGET);
   const packageValues = getReachPackageValues(safeBudget);
-  const totalReachMin = Math.round(packageValues.reachMin);
-  const totalReachMax = Math.round(packageValues.reachMax);
-  const engagementMin = Math.round(packageValues.engagementMin);
-  const engagementMax = Math.round(packageValues.engagementMax);
-  const dailyReachMin = Math.round(packageValues.dailyReachMin);
-  const dailyReachMax = Math.round(packageValues.dailyReachMax);
+  const totalReachMin = roundReachValue(packageValues.reachMin);
+  const totalReachMax = roundReachValue(packageValues.reachMax);
+  const engagementMin = roundEngagementValue(packageValues.engagementMin);
+  const engagementMax = roundEngagementValue(packageValues.engagementMax);
 
   return {
-    dailyReach: `${dailyReachMin} - ${dailyReachMax}`,
+    dailyReach: "",
     totalReach: `${totalReachMin} - ${totalReachMax}`,
     engagement: `${engagementMin} - ${engagementMax}`,
-    dailyReachText: formatRange(dailyReachMin, dailyReachMax),
+    dailyReachText: "",
     totalReachText: formatRange(totalReachMin, totalReachMax),
     engagementText: formatRange(engagementMin, engagementMax),
     totalCost: safeBudget
@@ -518,9 +514,7 @@ function getReachPackageValues(budget) {
       reachMin: packages[0].reachMin * multiplier,
       reachMax: packages[0].reachMax * multiplier,
       engagementMin: packages[0].engagementMin * multiplier,
-      engagementMax: packages[0].engagementMax * multiplier,
-      dailyReachMin: packages[0].dailyReachMin * multiplier,
-      dailyReachMax: packages[0].dailyReachMax * multiplier
+      engagementMax: packages[0].engagementMax * multiplier
     };
   }
 
@@ -534,9 +528,7 @@ function getReachPackageValues(budget) {
         reachMin: interpolate(start.reachMin, end.reachMin, ratio),
         reachMax: interpolate(start.reachMax, end.reachMax, ratio),
         engagementMin: interpolate(start.engagementMin, end.engagementMin, ratio),
-        engagementMax: interpolate(start.engagementMax, end.engagementMax, ratio),
-        dailyReachMin: interpolate(start.dailyReachMin, end.dailyReachMin, ratio),
-        dailyReachMax: interpolate(start.dailyReachMax, end.dailyReachMax, ratio)
+        engagementMax: interpolate(start.engagementMax, end.engagementMax, ratio)
       };
     }
   }
@@ -547,14 +539,20 @@ function getReachPackageValues(budget) {
     reachMin: lastPackage.reachMin * multiplier,
     reachMax: lastPackage.reachMax * multiplier,
     engagementMin: lastPackage.engagementMin * multiplier,
-    engagementMax: lastPackage.engagementMax * multiplier,
-    dailyReachMin: lastPackage.dailyReachMin * multiplier,
-    dailyReachMax: lastPackage.dailyReachMax * multiplier
+    engagementMax: lastPackage.engagementMax * multiplier
   };
 }
 
 function interpolate(start, end, ratio) {
   return start + ((end - start) * ratio);
+}
+
+function roundReachValue(value) {
+  return Math.round(value / 1000) * 1000;
+}
+
+function roundEngagementValue(value) {
+  return Math.round(value / 10) * 10;
 }
 
 function updatePreview() {
@@ -715,6 +713,23 @@ function syncRangeFromNumber(name) {
   if (name === "ageFrom" || name === "ageTo") {
     normalizeAgeRange(name);
   }
+  updateEstimate();
+  updatePreview();
+}
+
+function applyBudgetRules() {
+  const min = Number(form.budget.min);
+  const max = Number(form.budget.max);
+  let value = Number(form.budget.value);
+
+  if (!value || value < min) {
+    value = min;
+  }
+
+  value = Math.round(value / 5) * 5;
+  value = Math.min(Math.max(value, min), max);
+  form.budget.value = value;
+  form.budgetRange.value = value;
   updateEstimate();
   updatePreview();
 }
