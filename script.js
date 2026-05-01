@@ -42,7 +42,6 @@ const previewImage = document.getElementById("previewImage");
 const previewCta = document.getElementById("previewCta");
 const previewLogo = document.getElementById("previewLogo");
 const governorateOptions = document.getElementById("governorateOptions");
-const otherInterestsField = document.getElementById("otherInterestsField");
 const languageSummary = document.getElementById("languageSummary");
 
 let currentStep = 1;
@@ -54,6 +53,39 @@ const MAX_UPLOAD_IMAGE_SIZE = 1280;
 const IMAGE_UPLOAD_QUALITY = 0.78;
 const PRELOADER_MIN_TIME = 1400;
 const pageStartTime = Date.now();
+const REACH_PACKAGES = [
+  {
+    days: 5,
+    budget: 25,
+    reachMin: 140000,
+    reachMax: 180000,
+    engagementMin: 100,
+    engagementMax: 300
+  },
+  {
+    days: 8,
+    budget: 45,
+    reachMin: 280000,
+    reachMax: 390000,
+    engagementMin: 250,
+    engagementMax: 700
+  },
+  {
+    days: 15,
+    budget: 100,
+    reachMin: 580000,
+    reachMax: 800000,
+    engagementMin: 1200,
+    engagementMax: 2000
+  }
+].map((packageItem) => ({
+  ...packageItem,
+  dailyBudget: packageItem.budget / packageItem.days,
+  dailyReachMin: packageItem.reachMin / packageItem.days,
+  dailyReachMax: packageItem.reachMax / packageItem.days,
+  dailyEngagementMin: packageItem.engagementMin / packageItem.days,
+  dailyEngagementMax: packageItem.engagementMax / packageItem.days
+}));
 
 const SYRIA_LOCATIONS = {
   "دمشق": ["دمشق", "المزة", "المالكي", "أبو رمانة", "كفرسوسة", "الميدان", "برزة", "جرمانا"],
@@ -243,7 +275,6 @@ form.ageFrom.addEventListener("input", () => syncRangeFromNumber("ageFrom"));
 form.ageFromRange.addEventListener("input", () => syncNumberFromRange("ageFrom"));
 form.ageTo.addEventListener("input", () => syncRangeFromNumber("ageTo"));
 form.ageToRange.addEventListener("input", () => syncNumberFromRange("ageTo"));
-form.interests.addEventListener("change", updateOtherInterestsField);
 form.querySelectorAll('input[name="languages"]').forEach((checkbox) => {
   checkbox.addEventListener("change", updateLanguageSummary);
 });
@@ -357,11 +388,6 @@ function validateCurrentStep() {
       return false;
     }
 
-    if (form.interests.value === "غير ذلك" && !form.otherInterests.value.trim()) {
-      showMessage("يرجى كتابة الاهتمامات المطلوبة.", "error");
-      form.otherInterests.focus();
-      return false;
-    }
   }
 
   if (currentStep === 3) {
@@ -426,15 +452,99 @@ function normalizeUrl(value) {
 }
 
 function updateEstimate() {
+  const estimate = calculateCampaignEstimate();
+
+  document.getElementById("dailyReach").textContent = estimate.dailyReachText;
+  document.getElementById("totalReach").textContent = estimate.totalReachText;
+  document.getElementById("estimatedEngagement").textContent = estimate.engagementText;
+  document.getElementById("totalCost").textContent = `$${formatNumber(estimate.totalCost)}`;
+}
+
+function calculateCampaignEstimate() {
   const budget = Number(form.budget.value) || 0;
   const days = Number(form.days.value) || 0;
+  const goalType = getSelectedGoalType();
+
+  if (goalType === "reach") {
+    return calculateReachEstimate(budget, days);
+  }
+
   const dailyBudget = days > 0 ? budget / days : 0;
   const dailyReach = Math.round(dailyBudget * 850);
   const totalReach = dailyReach * days;
 
-  document.getElementById("dailyReach").textContent = formatNumber(dailyReach);
-  document.getElementById("totalReach").textContent = formatNumber(totalReach);
-  document.getElementById("totalCost").textContent = `$${formatNumber(budget)}`;
+  return {
+    dailyReach: dailyReach,
+    totalReach: totalReach,
+    engagement: Math.round(totalReach * 0.003),
+    dailyReachText: formatNumber(dailyReach),
+    totalReachText: formatNumber(totalReach),
+    engagementText: formatNumber(Math.round(totalReach * 0.003)),
+    totalCost: budget
+  };
+}
+
+function calculateReachEstimate(budget, days) {
+  const safeDays = Math.max(days, 1);
+  const dailyBudget = Math.max(budget / safeDays, 5);
+  const dailyValues = getReachDailyValues(dailyBudget);
+  const dailyReachMin = Math.round(dailyValues.reachMin);
+  const dailyReachMax = Math.round(dailyValues.reachMax);
+  const totalReachMin = Math.round(dailyReachMin * safeDays);
+  const totalReachMax = Math.round(dailyReachMax * safeDays);
+  const engagementMin = Math.round(dailyValues.engagementMin * safeDays);
+  const engagementMax = Math.round(dailyValues.engagementMax * safeDays);
+
+  return {
+    dailyReach: `${dailyReachMin} - ${dailyReachMax}`,
+    totalReach: `${totalReachMin} - ${totalReachMax}`,
+    engagement: `${engagementMin} - ${engagementMax}`,
+    dailyReachText: formatRange(dailyReachMin, dailyReachMax),
+    totalReachText: formatRange(totalReachMin, totalReachMax),
+    engagementText: formatRange(engagementMin, engagementMax),
+    totalCost: budget
+  };
+}
+
+function getReachDailyValues(dailyBudget) {
+  const packages = REACH_PACKAGES;
+
+  if (dailyBudget <= packages[0].dailyBudget) {
+    return {
+      reachMin: packages[0].dailyReachMin,
+      reachMax: packages[0].dailyReachMax,
+      engagementMin: packages[0].dailyEngagementMin,
+      engagementMax: packages[0].dailyEngagementMax
+    };
+  }
+
+  for (let index = 0; index < packages.length - 1; index += 1) {
+    const start = packages[index];
+    const end = packages[index + 1];
+
+    if (dailyBudget <= end.dailyBudget) {
+      const ratio = (dailyBudget - start.dailyBudget) / (end.dailyBudget - start.dailyBudget);
+      return {
+        reachMin: interpolate(start.dailyReachMin, end.dailyReachMin, ratio),
+        reachMax: interpolate(start.dailyReachMax, end.dailyReachMax, ratio),
+        engagementMin: interpolate(start.dailyEngagementMin, end.dailyEngagementMin, ratio),
+        engagementMax: interpolate(start.dailyEngagementMax, end.dailyEngagementMax, ratio)
+      };
+    }
+  }
+
+  const lastPackage = packages[packages.length - 1];
+  const multiplier = dailyBudget / lastPackage.dailyBudget;
+  return {
+    reachMin: lastPackage.dailyReachMin * multiplier,
+    reachMax: lastPackage.dailyReachMax * multiplier,
+    engagementMin: lastPackage.dailyEngagementMin * multiplier,
+    engagementMax: lastPackage.dailyEngagementMax * multiplier
+  };
+}
+
+function interpolate(start, end, ratio) {
+  return start + ((end - start) * ratio);
 }
 
 function updatePreview() {
@@ -459,6 +569,7 @@ function updateGoalFields() {
 
   previewCta.textContent = goalPreview.cta;
   previewCta.dataset.goalTone = goalPreview.tone;
+  updateEstimate();
 
   if (previewImageUrls.length) {
     renderPreviewCarousel();
@@ -643,16 +754,6 @@ function normalizeAgeRange(changedName = "") {
   form.ageToRange.min = ageFrom;
 }
 
-function updateOtherInterestsField() {
-  const shouldShow = form.interests.value === "غير ذلك";
-  otherInterestsField.hidden = !shouldShow;
-  form.otherInterests.required = shouldShow;
-
-  if (!shouldShow) {
-    form.otherInterests.value = "";
-  }
-}
-
 function updateLanguageSummary() {
   const selectedLanguages = getSelectedLanguages();
   languageSummary.textContent = selectedLanguages.length ? selectedLanguages.join("، ") : "اختر لغة أو أكثر";
@@ -671,10 +772,9 @@ function clampNumber(value, min, max) {
 }
 
 async function buildPayload() {
+  const estimate = calculateCampaignEstimate();
   const budget = Number(form.budget.value) || 0;
   const days = Number(form.days.value) || 0;
-  const dailyReach = Math.round((days > 0 ? budget / days : 0) * 850);
-  const totalReach = dailyReach * days;
   const imageFiles = await filesToBase64(form.adImages.files);
   const logoFile = await fileToBase64(form.companyLogo.files[0]);
   const selectedGovernorates = getSelectedGovernorates();
@@ -685,8 +785,8 @@ async function buildPayload() {
     campaignGoalType: getSelectedGoalType(),
     budget,
     days,
-    dailyReach,
-    totalReach,
+    dailyReach: estimate.dailyReachText,
+    totalReach: estimate.totalReachText,
     totalCost: budget,
     governorate: selectedGovernorates.join(", "),
     governorates: selectedGovernorates.join(", "),
@@ -697,7 +797,6 @@ async function buildPayload() {
     gender: form.gender.value,
     language: getSelectedLanguages().join(", "),
     languages: getSelectedLanguages().join(", "),
-    interests: getSelectedInterests(),
     caption: form.caption.value.trim(),
     shortDescription: form.shortDescription.value.trim(),
     longDescription: form.longDescription.value.trim(),
@@ -815,20 +914,16 @@ function clearSavedFormState() {
   }
 }
 
-function getSelectedInterests() {
-  if (form.interests.value === "غير ذلك") {
-    return form.otherInterests.value.trim();
-  }
-
-  return form.interests.value.trim();
-}
-
 function getSelectedLanguages() {
   return Array.from(form.querySelectorAll('input[name="languages"]:checked')).map((checkbox) => checkbox.value);
 }
 
 function formatNumber(value) {
   return new Intl.NumberFormat("en-US").format(value || 0);
+}
+
+function formatRange(min, max) {
+  return `${formatNumber(min)} - ${formatNumber(max)}`;
 }
 
 function showMessage(text, type) {
@@ -845,7 +940,6 @@ updateEstimate();
 updateGoalFields();
 updatePreview();
 normalizeAgeRange();
-updateOtherInterestsField();
 setDefaultLanguages();
 updateLanguageSummary();
 updateStep();
