@@ -51,8 +51,9 @@ const AGE_MIN = 18;
 const AGE_MAX = 60;
 const MIN_CAMPAIGN_BUDGET = 10;
 const MIN_CAMPAIGN_DAYS = 5;
-const MAX_UPLOAD_IMAGE_SIZE = 1280;
-const IMAGE_UPLOAD_QUALITY = 0.78;
+const AD_IMAGE_SIZE = 1080;
+const LOGO_IMAGE_SIZE = 512;
+const IMAGE_UPLOAD_QUALITY = 0.86;
 const PRELOADER_MIN_TIME = 1400;
 const pageStartTime = Date.now();
 const CAMPAIGN_PACKAGE_TABLES = {
@@ -974,17 +975,23 @@ async function buildPayload() {
 }
 
 function filesToBase64(fileList) {
-  return Promise.all(Array.from(fileList).map(fileToBase64));
+  return Promise.all(Array.from(fileList).map((file) => fileToBase64(file, {
+    size: AD_IMAGE_SIZE,
+    suffix: "ad"
+  })));
 }
 
-async function fileToBase64(file) {
+async function fileToBase64(file, options = {}) {
   if (!file) {
     return null;
   }
 
   if (file.type && file.type.startsWith("image/")) {
     try {
-      return await fileToCompressedImage(file);
+      return await fileToOptimizedImage(file, {
+        size: options.size || LOGO_IMAGE_SIZE,
+        suffix: options.suffix || "logo"
+      });
     } catch (error) {
       return readFileAsBase64(file);
     }
@@ -993,16 +1000,16 @@ async function fileToBase64(file) {
   return readFileAsBase64(file);
 }
 
-function fileToCompressedImage(file) {
+function fileToOptimizedImage(file, options) {
   return new Promise((resolve, reject) => {
     const image = new Image();
     const objectUrl = URL.createObjectURL(file);
+    const outputSize = options.size || AD_IMAGE_SIZE;
 
     image.onload = () => {
-      const scale = Math.min(MAX_UPLOAD_IMAGE_SIZE / image.width, MAX_UPLOAD_IMAGE_SIZE / image.height, 1);
       const canvas = document.createElement("canvas");
-      canvas.width = Math.max(Math.round(image.width * scale), 1);
-      canvas.height = Math.max(Math.round(image.height * scale), 1);
+      canvas.width = outputSize;
+      canvas.height = outputSize;
 
       const context = canvas.getContext("2d");
       if (!context) {
@@ -1011,7 +1018,8 @@ function fileToCompressedImage(file) {
         return;
       }
 
-      context.drawImage(image, 0, 0, canvas.width, canvas.height);
+      drawImageCover(context, image, outputSize, outputSize);
+      enhanceImageCanvas(context, outputSize, outputSize);
       URL.revokeObjectURL(objectUrl);
 
       canvas.toBlob((blob) => {
@@ -1024,7 +1032,7 @@ function fileToCompressedImage(file) {
           const safeName = file.name.replace(/\.[^.]+$/, "") || "dal-image";
           resolve({
             ...result,
-            name: `${safeName}.jpg`,
+            name: `${safeName}-${options.suffix || "optimized"}-${outputSize}x${outputSize}.jpg`,
             mimeType: "image/jpeg"
           });
         }).catch(reject);
@@ -1038,6 +1046,60 @@ function fileToCompressedImage(file) {
 
     image.src = objectUrl;
   });
+}
+
+function drawImageCover(context, image, targetWidth, targetHeight) {
+  const sourceRatio = image.width / image.height;
+  const targetRatio = targetWidth / targetHeight;
+  let sourceWidth = image.width;
+  let sourceHeight = image.height;
+  let sourceX = 0;
+  let sourceY = 0;
+
+  if (sourceRatio > targetRatio) {
+    sourceWidth = image.height * targetRatio;
+    sourceX = (image.width - sourceWidth) / 2;
+  } else {
+    sourceHeight = image.width / targetRatio;
+    sourceY = (image.height - sourceHeight) / 2;
+  }
+
+  context.fillStyle = "#ffffff";
+  context.fillRect(0, 0, targetWidth, targetHeight);
+  context.imageSmoothingEnabled = true;
+  context.imageSmoothingQuality = "high";
+  context.filter = "contrast(1.06) saturate(1.08) brightness(1.02)";
+  context.drawImage(image, sourceX, sourceY, sourceWidth, sourceHeight, 0, 0, targetWidth, targetHeight);
+  context.filter = "none";
+}
+
+function enhanceImageCanvas(context, width, height) {
+  const imageData = context.getImageData(0, 0, width, height);
+  const data = imageData.data;
+  const copy = new Uint8ClampedArray(data);
+  const amount = 0.32;
+
+  for (let y = 1; y < height - 1; y += 1) {
+    for (let x = 1; x < width - 1; x += 1) {
+      const index = (y * width + x) * 4;
+
+      for (let channel = 0; channel < 3; channel += 1) {
+        const center = copy[index + channel];
+        const left = copy[index + channel - 4];
+        const right = copy[index + channel + 4];
+        const top = copy[index + channel - (width * 4)];
+        const bottom = copy[index + channel + (width * 4)];
+        const blur = (left + right + top + bottom) / 4;
+        data[index + channel] = clampColor(center + ((center - blur) * amount));
+      }
+    }
+  }
+
+  context.putImageData(imageData, 0, 0);
+}
+
+function clampColor(value) {
+  return Math.max(0, Math.min(255, Math.round(value)));
 }
 
 function readFileAsBase64(file) {
