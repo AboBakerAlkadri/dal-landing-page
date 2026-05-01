@@ -488,17 +488,15 @@ function calculateCampaignEstimate() {
   };
 }
 
-function calculateReachEstimate(budget, days) {
-  const safeDays = Math.max(days, 1);
+function calculateReachEstimate(budget) {
   const safeBudget = Math.max(budget, MIN_CAMPAIGN_BUDGET);
-  const dailyBudget = safeBudget / safeDays;
-  const dailyValues = getReachDailyValues(dailyBudget);
-  const dailyReachMin = Math.round(dailyValues.reachMin);
-  const dailyReachMax = Math.round(dailyValues.reachMax);
-  const totalReachMin = Math.round(dailyReachMin * safeDays);
-  const totalReachMax = Math.round(dailyReachMax * safeDays);
-  const engagementMin = Math.round(dailyValues.engagementMin * safeDays);
-  const engagementMax = Math.round(dailyValues.engagementMax * safeDays);
+  const packageValues = getReachPackageValues(safeBudget);
+  const totalReachMin = Math.round(packageValues.reachMin);
+  const totalReachMax = Math.round(packageValues.reachMax);
+  const engagementMin = Math.round(packageValues.engagementMin);
+  const engagementMax = Math.round(packageValues.engagementMax);
+  const dailyReachMin = Math.round(packageValues.dailyReachMin);
+  const dailyReachMax = Math.round(packageValues.dailyReachMax);
 
   return {
     dailyReach: `${dailyReachMin} - ${dailyReachMax}`,
@@ -511,16 +509,18 @@ function calculateReachEstimate(budget, days) {
   };
 }
 
-function getReachDailyValues(dailyBudget) {
+function getReachPackageValues(budget) {
   const packages = REACH_PACKAGES;
 
-  if (dailyBudget <= packages[0].dailyBudget) {
-    const multiplier = dailyBudget / packages[0].dailyBudget;
+  if (budget <= packages[0].budget) {
+    const multiplier = budget / packages[0].budget;
     return {
-      reachMin: packages[0].dailyReachMin * multiplier,
-      reachMax: packages[0].dailyReachMax * multiplier,
-      engagementMin: packages[0].dailyEngagementMin * multiplier,
-      engagementMax: packages[0].dailyEngagementMax * multiplier
+      reachMin: packages[0].reachMin * multiplier,
+      reachMax: packages[0].reachMax * multiplier,
+      engagementMin: packages[0].engagementMin * multiplier,
+      engagementMax: packages[0].engagementMax * multiplier,
+      dailyReachMin: packages[0].dailyReachMin * multiplier,
+      dailyReachMax: packages[0].dailyReachMax * multiplier
     };
   }
 
@@ -528,24 +528,28 @@ function getReachDailyValues(dailyBudget) {
     const start = packages[index];
     const end = packages[index + 1];
 
-    if (dailyBudget <= end.dailyBudget) {
-      const ratio = (dailyBudget - start.dailyBudget) / (end.dailyBudget - start.dailyBudget);
+    if (budget <= end.budget) {
+      const ratio = (budget - start.budget) / (end.budget - start.budget);
       return {
-        reachMin: interpolate(start.dailyReachMin, end.dailyReachMin, ratio),
-        reachMax: interpolate(start.dailyReachMax, end.dailyReachMax, ratio),
-        engagementMin: interpolate(start.dailyEngagementMin, end.dailyEngagementMin, ratio),
-        engagementMax: interpolate(start.dailyEngagementMax, end.dailyEngagementMax, ratio)
+        reachMin: interpolate(start.reachMin, end.reachMin, ratio),
+        reachMax: interpolate(start.reachMax, end.reachMax, ratio),
+        engagementMin: interpolate(start.engagementMin, end.engagementMin, ratio),
+        engagementMax: interpolate(start.engagementMax, end.engagementMax, ratio),
+        dailyReachMin: interpolate(start.dailyReachMin, end.dailyReachMin, ratio),
+        dailyReachMax: interpolate(start.dailyReachMax, end.dailyReachMax, ratio)
       };
     }
   }
 
   const lastPackage = packages[packages.length - 1];
-  const multiplier = dailyBudget / lastPackage.dailyBudget;
+  const multiplier = budget / lastPackage.budget;
   return {
-    reachMin: lastPackage.dailyReachMin * multiplier,
-    reachMax: lastPackage.dailyReachMax * multiplier,
-    engagementMin: lastPackage.dailyEngagementMin * multiplier,
-    engagementMax: lastPackage.dailyEngagementMax * multiplier
+    reachMin: lastPackage.reachMin * multiplier,
+    reachMax: lastPackage.reachMax * multiplier,
+    engagementMin: lastPackage.engagementMin * multiplier,
+    engagementMax: lastPackage.engagementMax * multiplier,
+    dailyReachMin: lastPackage.dailyReachMin * multiplier,
+    dailyReachMax: lastPackage.dailyReachMax * multiplier
   };
 }
 
@@ -699,7 +703,12 @@ function syncRangeFromNumber(name) {
   const rangeInput = form[`${name}Range`];
   const min = Number(numberInput.min);
   const max = Number(numberInput.max);
-  const value = Math.min(Math.max(Number(numberInput.value) || min, min), max);
+  let value = Math.min(Math.max(Number(numberInput.value) || min, min), max);
+
+  if (name === "budget") {
+    value = Math.round(value / 5) * 5;
+    value = Math.min(Math.max(value, min), max);
+  }
 
   numberInput.value = value;
   rangeInput.value = value;

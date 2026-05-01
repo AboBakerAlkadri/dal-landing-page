@@ -147,23 +147,23 @@
               الميزانية بالدولار
               <div class="range-control">
                 <div class="stepper">
-                  <button type="button" data-stepper="budget" data-change="-1">-</button>
-                  <input type="number" name="budget" min="10" max="10000" step="1" value="50" required>
-                  <button type="button" data-stepper="budget" data-change="1">+</button>
+                  <button type="button" data-stepper="budget" data-change="-5">-</button>
+                  <input type="number" name="budget" min="10" max="10000" step="5" value="50" required>
+                  <button type="button" data-stepper="budget" data-change="5">+</button>
                 </div>
-                <input type="range" name="budgetRange" min="10" max="10000" step="1" value="50" aria-label="الميزانية بالدولار">
+                <input type="range" name="budgetRange" min="10" max="10000" step="5" value="50" aria-label="الميزانية بالدولار">
               </div>
-              <small class="field-note">أقل ميزانية للحملة هي 10$.</small>
+              <small class="field-note">أقل ميزانية للحملة هي 10$، وتزيد الميزانية 5$ في كل نقرة.</small>
             </label>
             <label>
               عدد الأيام
               <div class="range-control">
                 <div class="stepper">
                   <button type="button" data-stepper="days" data-change="-1">-</button>
-                  <input type="number" name="days" min="1" max="365" step="1" value="7" required>
+                  <input type="number" name="days" min="1" max="30" step="1" value="7" required>
                   <button type="button" data-stepper="days" data-change="1">+</button>
                 </div>
-                <input type="range" name="daysRange" min="1" max="365" step="1" value="7" aria-label="عدد الأيام">
+                <input type="range" name="daysRange" min="1" max="30" step="1" value="7" aria-label="عدد الأيام">
               </div>
             </label>
           </div>
@@ -340,6 +340,6 @@
     </section>
   </div>
 
-  <script src="script.js?v=20260501-budget-min-10"></script>
+  <script src="script.js?v=20260501-budget-step-days-cap"></script>
 </body>
 </html>
