@@ -135,15 +135,101 @@ function ensureCampaignHeaders(sheet) {
 }
 
 function normalizeCampaignSheet(sheet, shouldFormat) {
-  removeDeprecatedCampaignColumns(sheet);
-  removeCampaignTypeColumn(sheet);
-  removeHeaderLikeRows(sheet);
+  const normalizedRows = getNormalizedCampaignRows(sheet);
+
+  sheet.clear();
   ensureCampaignHeaders(sheet);
-  repairLegacyCampaignLeadRows(sheet);
+
+  if (normalizedRows.length) {
+    sheet.getRange(2, 1, normalizedRows.length, CAMPAIGN_HEADERS.length).setValues(normalizedRows);
+  }
+
   trimExtraCampaignColumns(sheet);
   if (shouldFormat) {
     formatCampaignSheet(sheet);
   }
+}
+
+function getNormalizedCampaignRows(sheet) {
+  const lastRow = sheet.getLastRow();
+  const lastColumn = sheet.getLastColumn();
+
+  if (lastRow <= 1 || !lastColumn) {
+    return [];
+  }
+
+  const values = sheet.getRange(1, 1, lastRow, lastColumn).getValues();
+  const headers = values[0].map((cell) => normalizeHeaderName(cell));
+  const rows = values.slice(1);
+
+  return rows
+    .filter((row) => !isEmptyRow(row))
+    .filter((row) => !isHeaderLikeRow(row))
+    .map((row) => normalizeCampaignRow(row, headers))
+    .filter((row) => !isEmptyRow(row));
+}
+
+function normalizeCampaignRow(row, headers) {
+  if (String(row[0] || "").trim() === "campaignLead") {
+    return normalizeLegacyCampaignRow(row);
+  }
+
+  return CAMPAIGN_HEADERS.map((header) => {
+    const index = findHeaderIndex(headers, header);
+    return index === -1 ? "" : row[index];
+  });
+}
+
+function normalizeLegacyCampaignRow(row) {
+  return CAMPAIGN_HEADERS.map((header) => {
+    const legacyValue = getLegacyCampaignValue(row, header);
+    return legacyValue === undefined ? "" : legacyValue;
+  });
+}
+
+function findHeaderIndex(headers, header) {
+  const aliases = getHeaderAliases(header).map((name) => normalizeHeaderName(name));
+  return headers.findIndex((name) => aliases.includes(name));
+}
+
+function getHeaderAliases(header) {
+  const aliases = {
+    "المحافظات المستهدفة": ["المحافظات المستهدفة", "المحافظات", "المحافظة", "المناطق"],
+    "اللغات": ["اللغات", "اللغة"],
+    "روابط الصور في Drive": ["روابط الصور في Drive", "أسماء الصور المختارة", "أسماء الصور المحفوظة"],
+    "رابط شعار العميل في Drive": ["رابط شعار العميل في Drive", "اسم ملف الشعار"],
+    "رابط الموقع": ["رابط الموقع", "رابط الموقع الإلكتروني"],
+    "رقم هاتف المعلن": ["رقم هاتف المعلن", "رقم الهاتف"],
+    "رقم الهاتف في الإعلان": ["رقم الهاتف في الإعلان", "رقم التواصل"]
+  };
+
+  return aliases[header] || [header];
+}
+
+function normalizeHeaderName(value) {
+  return String(value || "").trim().replace(/\s+/g, " ");
+}
+
+function isEmptyRow(row) {
+  return row.every((cell) => !String(cell || "").trim());
+}
+
+function isHeaderLikeRow(row) {
+  const headerWords = new Set(CAMPAIGN_HEADERS.concat([
+    "نوع النموذج",
+    "كود الهدف",
+    "المدينة",
+    "المحافظة",
+    "المحافظات",
+    "المناطق",
+    "اسم ملف الشعار",
+    "أسماء الصور المحفوظة",
+    "أسماء الصور المختارة"
+  ]).map((header) => normalizeHeaderName(header)));
+  const filledCells = row.map((cell) => normalizeHeaderName(cell)).filter(Boolean);
+  const matchingHeaders = filledCells.filter((cell) => headerWords.has(cell));
+
+  return filledCells.length > 0 && matchingHeaders.length >= Math.min(3, filledCells.length);
 }
 
 function ensureCampaignColumnCount(sheet) {
