@@ -586,9 +586,17 @@ function normalizeUrl(value) {
 
 function updateEstimate() {
   const estimate = calculateCampaignEstimate();
+  const estimateCard = document.getElementById("estimateCard");
   const metricLabels = getEstimateMetricLabels();
   const primaryMetricRow = document.getElementById("primaryMetricValue").closest("div");
   const secondaryMetricRow = document.getElementById("secondaryMetricRow");
+  const hasCampaignGoal = Boolean(getSelectedGoalType());
+
+  estimateCard.hidden = !hasCampaignGoal;
+
+  if (!hasCampaignGoal) {
+    return;
+  }
 
   document.getElementById("totalReach").textContent = estimate.totalReachText;
   document.getElementById("primaryMetricLabel").textContent = metricLabels.primary;
