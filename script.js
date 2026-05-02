@@ -9,7 +9,7 @@ const LINKS = {
   support: "https://dalsyria.com/techsupport",
   blog: "https://dalsyria.com/blog",
   help: "https://dalsyria.com/blogs",
-  rateApp: "https://play.google.com/store/apps/details?id=com.yashamDigital.dal&hl=en",
+  rateApp: "https://play.google.com/store/apps/details?id=com.yashamDigital.dal&hl",
   jobs: "https://dalsyria.com/jobs",
   jobsApply: "https://dalsyria.com/jobs/apply",
   whatsapp: "https://wa.me/963939769472",
