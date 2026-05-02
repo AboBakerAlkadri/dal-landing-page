@@ -43,7 +43,8 @@ const previewCta = document.getElementById("previewCta");
 const previewLogo = document.getElementById("previewLogo");
 const governorateOptions = document.getElementById("governorateOptions");
 const languageSummary = document.getElementById("languageSummary");
-const campaignRequestsCount = document.getElementById("campaignRequestsCount");
+const clearImagesButton = document.getElementById("clearImages");
+const clearLogoButton = document.getElementById("clearLogo");
 
 let currentStep = 1;
 let previewImageUrls = [];
@@ -247,7 +248,6 @@ document.querySelectorAll("[data-link]").forEach((element) => {
 });
 
 populateGovernorates();
-loadCampaignRequestsCount();
 
 if (openCampaign) {
   openCampaign.addEventListener("click", () => {
@@ -319,34 +319,6 @@ function hideQuickContactMenu() {
   quickContactMenu.hidden = true;
 }
 
-async function loadCampaignRequestsCount() {
-  if (!campaignRequestsCount || GOOGLE_SCRIPT_URL.includes("PUT_YOUR")) {
-    return;
-  }
-
-  try {
-    const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=campaignStats&ts=${Date.now()}`, {
-      method: "GET",
-      cache: "no-store"
-    });
-    const result = await response.json();
-
-    if (response.ok && result.success) {
-      updateCampaignRequestsCount(result.campaignRequests);
-    }
-  } catch (error) {
-    campaignRequestsCount.textContent = "--";
-  }
-}
-
-function updateCampaignRequestsCount(value) {
-  if (!campaignRequestsCount || value === undefined || value === null) {
-    return;
-  }
-
-  campaignRequestsCount.textContent = `+${formatNumber(Number(value) || 0)}`;
-}
-
 function updateStep() {
   document.querySelectorAll("[data-step]").forEach((step) => {
     step.classList.toggle("is-active", Number(step.dataset.step) === currentStep);
@@ -381,6 +353,8 @@ form.addEventListener("input", () => {
 form.campaignGoal.addEventListener("change", handleCampaignGoalSelection);
 form.adImages.addEventListener("change", updatePreviewImage);
 form.companyLogo.addEventListener("change", updatePreviewLogo);
+clearImagesButton?.addEventListener("click", clearAdImages);
+clearLogoButton?.addEventListener("click", clearCompanyLogo);
 form.budget.addEventListener("blur", () => applyBudgetRules());
 form.budgetRange.addEventListener("input", () => syncNumberFromRange("budget"));
 form.days.addEventListener("input", () => syncRangeFromNumber("days"));
@@ -433,7 +407,6 @@ form.addEventListener("submit", async (event) => {
       throw new Error(result.message || "Send failed");
     }
 
-    updateCampaignRequestsCount(result.campaignRequests);
     form.reset();
     clearSavedFormState();
     setDefaultLanguages();
@@ -554,7 +527,7 @@ function validateCurrentStep() {
 }
 
 function isValidPhoneNumber(value) {
-  const normalized = value.replace(/[\s()+-]/g, "");
+  const normalized = normalizePhoneDigits(value).replace(/[\s()+-]/g, "");
   return /^\d{8,15}$/.test(normalized);
 }
 
@@ -801,12 +774,15 @@ function getSelectedGoalLabel() {
 }
 
 function updatePreviewImage() {
-  previewImageUrls.forEach((url) => URL.revokeObjectURL(url));
+  previewImageUrls.forEach((item) => URL.revokeObjectURL(item.url));
   previewImageUrls = Array.from(form.adImages.files).map((file, index) => ({
     url: URL.createObjectURL(file),
     name: file.name,
     index
   }));
+  if (clearImagesButton) {
+    clearImagesButton.hidden = !previewImageUrls.length;
+  }
   renderPreviewCarousel();
 }
 
@@ -819,11 +795,17 @@ function updatePreviewLogo() {
   const file = form.companyLogo.files[0];
   if (!file) {
     previewLogo.src = "dal-icon.jpg";
+    if (clearLogoButton) {
+      clearLogoButton.hidden = true;
+    }
     return;
   }
 
   previewLogoUrl = URL.createObjectURL(file);
   previewLogo.src = previewLogoUrl;
+  if (clearLogoButton) {
+    clearLogoButton.hidden = false;
+  }
 }
 
 function renderPreviewCarousel() {
@@ -845,6 +827,13 @@ function renderPreviewCarousel() {
     image.src = item.url;
     image.alt = `معاينة صورة الإعلان ${item.index + 1}`;
 
+    const removeButton = document.createElement("button");
+    removeButton.type = "button";
+    removeButton.className = "carousel-remove";
+    removeButton.setAttribute("aria-label", `حذف الصورة ${item.index + 1}`);
+    removeButton.innerHTML = '<i class="fa-solid fa-xmark" aria-hidden="true"></i>';
+    removeButton.addEventListener("click", () => removeAdImage(item.index));
+
     const body = document.createElement("div");
     body.className = "carousel-card-body";
 
@@ -861,7 +850,7 @@ function renderPreviewCarousel() {
     button.dataset.goalTone = goalPreview.tone;
 
     body.append(title, price, button);
-    card.append(image, body);
+    card.append(image, removeButton, body);
     carousel.appendChild(card);
   });
 
@@ -878,14 +867,17 @@ function populateGovernorates() {
 
   form.allSyria.addEventListener("change", updateGovernorateSelection);
   form.querySelectorAll('input[name="governorates"]').forEach((checkbox) => {
-    checkbox.addEventListener("change", updateGovernorateSelection);
+    checkbox.addEventListener("change", () => updateGovernorateSelection(checkbox));
   });
 }
 
-function updateGovernorateSelection() {
+function updateGovernorateSelection(changedCheckbox = null) {
+  if (changedCheckbox?.checked && form.allSyria.checked) {
+    form.allSyria.checked = false;
+  }
+
   const allChecked = form.allSyria.checked;
   form.querySelectorAll('input[name="governorates"]').forEach((checkbox) => {
-    checkbox.disabled = allChecked;
     checkbox.checked = allChecked ? false : checkbox.checked;
   });
 }
@@ -1012,12 +1004,12 @@ async function buildPayload() {
     caption: form.caption.value.trim(),
     shortDescription: form.shortDescription.value.trim(),
     longDescription: form.longDescription.value.trim(),
-    whatsappNumber: form.whatsappNumber.value.trim(),
+    whatsappNumber: normalizePhoneDigits(form.whatsappNumber.value.trim()),
     destinationUrl: normalizeUrl(form.destinationUrl.value),
     imageFiles,
     logoFile,
-    phone: form.phone.value.trim(),
-    contactNumber: form.contactNumber.value.trim(),
+    phone: normalizePhoneDigits(form.phone.value.trim()),
+    contactNumber: normalizePhoneDigits(form.contactNumber.value.trim()),
     customerName: form.customerName.value.trim()
   };
 }
@@ -1027,6 +1019,40 @@ function filesToBase64(fileList) {
     size: AD_IMAGE_SIZE,
     suffix: "ad"
   })));
+}
+
+function removeAdImage(indexToRemove) {
+  const files = Array.from(form.adImages.files).filter((_, index) => index !== indexToRemove);
+  setFileInputFiles(form.adImages, files);
+  updatePreviewImage();
+}
+
+function clearAdImages() {
+  setFileInputFiles(form.adImages, []);
+  updatePreviewImage();
+}
+
+function clearCompanyLogo() {
+  setFileInputFiles(form.companyLogo, []);
+  updatePreviewLogo();
+}
+
+function setFileInputFiles(input, files) {
+  const dataTransfer = new DataTransfer();
+  files.forEach((file) => dataTransfer.items.add(file));
+  input.files = dataTransfer.files;
+}
+
+function normalizePhoneDigits(value) {
+  const arabicDigits = "٠١٢٣٤٥٦٧٨٩";
+  const persianDigits = "۰۱۲۳۴۵۶۷۸۹";
+
+  return String(value || "").replace(/[٠-٩۰-۹]/g, (digit) => {
+    const arabicIndex = arabicDigits.indexOf(digit);
+    if (arabicIndex !== -1) return String(arabicIndex);
+    const persianIndex = persianDigits.indexOf(digit);
+    return persianIndex !== -1 ? String(persianIndex) : digit;
+  });
 }
 
 async function fileToBase64(file, options = {}) {
@@ -1173,10 +1199,16 @@ function readFileAsBase64(file) {
 function clearSavedFormState() {
   previewImageUrls.forEach((item) => URL.revokeObjectURL(item.url));
   previewImageUrls = [];
+  if (clearImagesButton) {
+    clearImagesButton.hidden = true;
+  }
 
   if (previewLogoUrl) {
     URL.revokeObjectURL(previewLogoUrl);
     previewLogoUrl = "";
+  }
+  if (clearLogoButton) {
+    clearLogoButton.hidden = true;
   }
 
   try {

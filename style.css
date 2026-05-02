@@ -857,34 +857,24 @@ input[type="range"] {
   font-weight: 800;
 }
 
-.trust-counter {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-  gap: 10px;
-  margin: 14px 0;
-  padding: 14px 16px;
+.clear-file-btn {
+  min-height: 44px;
+  justify-self: start;
   border: 1px solid rgba(255, 224, 27, 0.28);
-  border-radius: 16px;
-  color: var(--text);
-  background: rgba(255, 224, 27, 0.08);
-  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.22);
-}
-
-.trust-counter i,
-.trust-counter strong {
+  border-radius: 8px;
+  padding: 0 14px;
   color: var(--yellow);
+  background: rgba(255, 224, 27, 0.08);
+  font-weight: 900;
+  cursor: pointer;
 }
 
-.trust-counter span {
-  color: var(--muted);
-  font-size: 0.9rem;
-  font-weight: 800;
+.clear-file-btn i {
+  margin-left: 6px;
 }
 
-.trust-counter strong {
-  font-size: 1.25rem;
-  font-weight: 950;
+.clear-file-btn:hover {
+  background: rgba(255, 224, 27, 0.14);
 }
 
 .estimate-card {
@@ -999,11 +989,30 @@ input[type="range"] {
 }
 
 .carousel-card {
+  position: relative;
   overflow: hidden;
   scroll-snap-align: start;
   border: 1px solid #d9dde5;
   border-radius: 18px;
   background: #fff;
+}
+
+.carousel-remove {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 2;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 50%;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.62);
+  cursor: pointer;
+}
+
+.carousel-remove:hover {
+  background: rgba(0, 0, 0, 0.78);
 }
 
 .carousel-card img {

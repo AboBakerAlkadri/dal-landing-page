@@ -69,12 +69,6 @@
         </button>
       </div>
 
-      <div class="trust-counter" aria-live="polite">
-        <i class="fa-solid fa-chart-line" aria-hidden="true"></i>
-        <span>طلبات حملات تم استلامها</span>
-        <strong id="campaignRequestsCount">--</strong>
-      </div>
-
       <div class="links-layout">
         <div class="action-grid">
           <a class="action-link" href="#" data-link="about">
@@ -247,21 +241,25 @@
             رفع شعار المؤسسة أو الموقع اختياري
             <input type="file" name="companyLogo" accept="image/*">
           </label>
+          <button class="clear-file-btn" type="button" id="clearLogo" hidden>
+            <i class="fa-solid fa-trash-can" aria-hidden="true"></i>
+            حذف الشعار
+          </button>
           <label>
             الاسم اختياري
             <input type="text" name="customerName" placeholder="اسمك">
           </label>
           <label>
             رقم هاتف المعلن
-            <input type="tel" name="phone" placeholder="09xxxxxxxx">
+            <input type="tel" name="phone" inputmode="numeric" placeholder="09xxxxxxxx">
           </label>
           <label>
             رقم الهاتف في الإعلان
-            <input type="tel" name="contactNumber" placeholder="مثال: 0939769472">
+            <input type="tel" name="contactNumber" inputmode="numeric" placeholder="مثال: 0939769472">
           </label>
           <label>
             رقم واتساب
-            <input type="tel" name="whatsappNumber" placeholder="مثال: 963939769472">
+            <input type="tel" name="whatsappNumber" inputmode="numeric" placeholder="مثال: 963939769472">
           </label>
           <label>
             رابط الموقع الإلكتروني اختياري
@@ -283,6 +281,10 @@
             رفع صورة أو أكثر للإعلان اختياري
             <input type="file" name="adImages" accept="image/*" multiple>
           </label>
+          <button class="clear-file-btn" type="button" id="clearImages" hidden>
+            <i class="fa-solid fa-trash-can" aria-hidden="true"></i>
+            حذف كل الصور
+          </button>
 
           <article class="ad-preview">
             <div class="preview-head">
