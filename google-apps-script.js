@@ -34,7 +34,7 @@ const CAMPAIGN_HEADERS = [
   "رقم واتساب",
   "رابط الموقع",
   "روابط الصور في Drive",
-  "رابط شعار العميل في Drive",
+  "رابط صورة الشعار في Drive",
   "رقم هاتف المعلن",
   "رقم الهاتف في الإعلان",
   "اسم العميل"
@@ -92,6 +92,7 @@ function setupCampaignSheet() {
   const sheet = getCampaignSheet();
   sheet.clear();
   ensureCampaignHeaders(sheet);
+  trimExtraColumns(sheet);
   formatCampaignHeader(sheet);
 }
 
@@ -138,9 +139,11 @@ function buildCampaignRow(data, uploadedImages, uploadedLogo) {
 function ensureCampaignSheetReady(sheet) {
   if (!hasExactCampaignHeaders(sheet)) {
     sheet.clear();
-    ensureCampaignHeaders(sheet);
-    formatCampaignHeader(sheet);
   }
+
+  ensureCampaignHeaders(sheet);
+  trimExtraColumns(sheet);
+  formatCampaignHeader(sheet);
 }
 
 function ensureCampaignHeaders(sheet) {
@@ -267,6 +270,13 @@ function ensureColumnCount(sheet, count) {
   const currentColumns = sheet.getMaxColumns();
   if (currentColumns < count) {
     sheet.insertColumnsAfter(currentColumns, count - currentColumns);
+  }
+}
+
+function trimExtraColumns(sheet) {
+  const currentColumns = sheet.getMaxColumns();
+  if (currentColumns > CAMPAIGN_HEADERS.length) {
+    sheet.deleteColumns(CAMPAIGN_HEADERS.length + 1, currentColumns - CAMPAIGN_HEADERS.length);
   }
 }
 
