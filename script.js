@@ -30,6 +30,7 @@ const linkFrame = document.getElementById("linkFrame");
 const iframeTitle = document.getElementById("iframeTitle");
 const quickContactToggle = document.getElementById("quickContactToggle");
 const quickContactMenu = document.getElementById("quickContactMenu");
+const themeToggle = document.getElementById("themeToggle");
 const form = document.getElementById("campaignForm");
 const prevStepButton = document.getElementById("prevStep");
 const nextStepButton = document.getElementById("nextStep");
@@ -60,6 +61,7 @@ const LOGO_IMAGE_SIZE = 512;
 const IMAGE_UPLOAD_QUALITY = 0.86;
 const PRELOADER_MIN_TIME = 1400;
 const pageStartTime = Date.now();
+const THEME_STORAGE_KEY = "dalTheme";
 const CAMPAIGN_PACKAGE_TABLES = {
   reach: [
   {
@@ -249,6 +251,7 @@ document.querySelectorAll("[data-link]").forEach((element) => {
   }
 });
 
+setupThemeToggle();
 populateGovernorates();
 
 if (openCampaign) {
@@ -319,6 +322,47 @@ function closeIframe() {
 
 function hideQuickContactMenu() {
   quickContactMenu.hidden = true;
+}
+
+function setupThemeToggle() {
+  const savedTheme = getSavedTheme();
+  applyTheme(savedTheme);
+
+  themeToggle?.addEventListener("click", () => {
+    const currentTheme = document.documentElement.dataset.theme === "light" ? "light" : "dark";
+    const nextTheme = currentTheme === "dark" ? "light" : "dark";
+    applyTheme(nextTheme);
+    saveTheme(nextTheme);
+  });
+}
+
+function applyTheme(theme) {
+  const normalizedTheme = theme === "light" ? "light" : "dark";
+  document.documentElement.dataset.theme = normalizedTheme;
+
+  if (!themeToggle) return;
+
+  const isLight = normalizedTheme === "light";
+  themeToggle.setAttribute("aria-pressed", String(isLight));
+  themeToggle.innerHTML = isLight
+    ? '<i class="fa-solid fa-sun" aria-hidden="true"></i><span>الوضع الفاتح</span>'
+    : '<i class="fa-solid fa-moon" aria-hidden="true"></i><span>الوضع الداكن</span>';
+}
+
+function getSavedTheme() {
+  try {
+    return window.localStorage.getItem(THEME_STORAGE_KEY) || "dark";
+  } catch (error) {
+    return "dark";
+  }
+}
+
+function saveTheme(theme) {
+  try {
+    window.localStorage.setItem(THEME_STORAGE_KEY, theme);
+  } catch (error) {
+    // قد لا يكون التخزين متاحًا في بعض المتصفحات الخاصة.
+  }
 }
 
 function updateStep() {

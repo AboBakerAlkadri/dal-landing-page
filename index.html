@@ -13,7 +13,14 @@
   <link rel="icon" href="dal-icon.jpg">
   <link rel="preconnect" href="https://cdnjs.cloudflare.com">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <link rel="stylesheet" href="style.css?v=20260501-submit-polish">
+  <script>
+    try {
+      document.documentElement.dataset.theme = localStorage.getItem("dalTheme") || "dark";
+    } catch (error) {
+      document.documentElement.dataset.theme = "dark";
+    }
+  </script>
+  <link rel="stylesheet" href="style.css?v=20260502-theme-toggle">
 </head>
 <body>
   <div class="preloader" id="preloader" aria-label="جارٍ تحميل الصفحة">
@@ -25,6 +32,11 @@
   </div>
 
   <main class="page-shell">
+    <button class="theme-toggle" type="button" id="themeToggle" aria-label="تبديل الوضع" aria-pressed="false">
+      <i class="fa-solid fa-moon" aria-hidden="true"></i>
+      <span>الوضع الداكن</span>
+    </button>
+
     <section class="hero" aria-labelledby="main-title">
       <div class="hero-brand-row">
         <div class="brand-mark">
