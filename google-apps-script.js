@@ -128,8 +128,8 @@ function buildCampaignRow(data, uploadedImages, uploadedLogo) {
     data.longDescription || "",
     data.whatsappNumber || "",
     data.destinationUrl || "",
-    uploadedImages.join(", "),
-    uploadedLogo.join(", "),
+    uploadedImages.join("\n"),
+    uploadedLogo.join("\n"),
     data.phone || "",
     data.contactNumber || "",
     data.customerName || ""
@@ -201,6 +201,7 @@ function formatCampaignRow(sheet, rowNumber) {
     .setBackground("#ffffff")
     .setHorizontalAlignment("center")
     .setVerticalAlignment("middle")
+    .setWrap(true)
     .setBorder(true, true, true, true, true, true, "#000000", SpreadsheetApp.BorderStyle.SOLID);
 
   sheet.getRange(rowNumber, 3).setNumberFormat("$#,##0");
