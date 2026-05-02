@@ -337,7 +337,7 @@ function setupThemeToggle() {
 }
 
 function applyTheme(theme) {
-  const normalizedTheme = theme === "light" ? "light" : "dark";
+  const normalizedTheme = theme === "dark" ? "dark" : "light";
   document.documentElement.dataset.theme = normalizedTheme;
 
   if (!themeToggle) return;
@@ -345,15 +345,15 @@ function applyTheme(theme) {
   const isLight = normalizedTheme === "light";
   themeToggle.setAttribute("aria-pressed", String(isLight));
   themeToggle.innerHTML = isLight
-    ? '<i class="fa-solid fa-sun" aria-hidden="true"></i><span>الوضع الفاتح</span>'
-    : '<i class="fa-solid fa-moon" aria-hidden="true"></i><span>الوضع الداكن</span>';
+    ? '<i class="fa-solid fa-moon" aria-hidden="true"></i><span>الوضع الداكن</span>'
+    : '<i class="fa-solid fa-sun" aria-hidden="true"></i><span>الوضع الفاتح</span>';
 }
 
 function getSavedTheme() {
   try {
-    return window.localStorage.getItem(THEME_STORAGE_KEY) || "dark";
+    return window.localStorage.getItem(THEME_STORAGE_KEY) || "light";
   } catch (error) {
-    return "dark";
+    return "light";
   }
 }
 

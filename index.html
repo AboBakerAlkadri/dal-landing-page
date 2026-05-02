@@ -15,12 +15,12 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <script>
     try {
-      document.documentElement.dataset.theme = localStorage.getItem("dalTheme") || "dark";
+      document.documentElement.dataset.theme = localStorage.getItem("dalTheme") || "light";
     } catch (error) {
-      document.documentElement.dataset.theme = "dark";
+      document.documentElement.dataset.theme = "light";
     }
   </script>
-  <link rel="stylesheet" href="style.css?v=20260502-theme-toggle">
+  <link rel="stylesheet" href="style.css?v=20260502-light-default">
 </head>
 <body>
   <div class="preloader" id="preloader" aria-label="جارٍ تحميل الصفحة">
@@ -362,6 +362,6 @@
     </section>
   </div>
 
-  <script src="script.js?v=20260501-clean-sheet-payload"></script>
+  <script src="script.js?v=20260502-light-default"></script>
 </body>
 </html>

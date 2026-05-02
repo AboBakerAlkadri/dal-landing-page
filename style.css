@@ -204,8 +204,9 @@ h1 {
 
 .hero-subtitle {
   margin-bottom: 8px;
-  font-size: 1.12rem;
+  font-size: clamp(0.82rem, 3vw, 1.02rem);
   font-weight: 800;
+  white-space: nowrap;
 }
 
 .hero-copy {
@@ -1360,6 +1361,10 @@ button:disabled {
   .brand-mark {
     width: 124px;
     height: 124px;
+  }
+
+  .hero-subtitle {
+    font-size: 1.08rem;
   }
 
   .two-cols {
