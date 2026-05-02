@@ -878,7 +878,7 @@ function updateGovernorateSelection(changedCheckbox = null) {
 
   const allChecked = form.allSyria.checked;
   form.querySelectorAll('input[name="governorates"]').forEach((checkbox) => {
-    checkbox.checked = allChecked ? false : checkbox.checked;
+    checkbox.checked = allChecked ? true : checkbox.checked;
   });
 }
 
