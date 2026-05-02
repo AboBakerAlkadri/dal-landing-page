@@ -1,4 +1,4 @@
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbykM9o26zyf1HVJdrVUBqsGinMdG_ibhImDIWYbX6YSyKcejpUzQSvy6dzH2XWAPkFlZA/exec";
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw3V3976iPXnRGIBTy7Hfo8FJLfwGmXfKdvmkXXDsmIqbvlOA9FiMq3pRbM3ZGPdHe3/exec";
 
 const LINKS = {
   googlePlay: "https://play.google.com/store/apps/details?id=com.yashamDigital.dal&gl=DE",
