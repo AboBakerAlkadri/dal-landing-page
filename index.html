@@ -359,9 +359,14 @@
       </button>
       <h2 id="iframeTitle">تطبيق دال</h2>
       <iframe id="linkFrame" title="رابط دال"></iframe>
+      <div class="iframe-fallback" id="iframeFallback" hidden>
+        <i class="fa-solid fa-up-right-from-square" aria-hidden="true"></i>
+        <p>هذا الرابط لا يسمح بالعرض داخل الصفحة.</p>
+        <a class="primary-btn" href="#" id="iframeExternalLink" target="_blank" rel="noopener noreferrer">فتح الرابط خارجيًا</a>
+      </div>
     </section>
   </div>
 
-  <script src="script.js?v=20260502-light-default"></script>
+  <script src="script.js?v=20260502-iframe-fallback"></script>
 </body>
 </html>

@@ -28,6 +28,8 @@ const closeModalButtons = document.querySelectorAll("[data-close-modal]");
 const iframeModal = document.getElementById("iframeModal");
 const linkFrame = document.getElementById("linkFrame");
 const iframeTitle = document.getElementById("iframeTitle");
+const iframeFallback = document.getElementById("iframeFallback");
+const iframeExternalLink = document.getElementById("iframeExternalLink");
 const quickContactToggle = document.getElementById("quickContactToggle");
 const quickContactMenu = document.getElementById("quickContactMenu");
 const themeToggle = document.getElementById("themeToggle");
@@ -62,6 +64,17 @@ const IMAGE_UPLOAD_QUALITY = 0.86;
 const PRELOADER_MIN_TIME = 1400;
 const pageStartTime = Date.now();
 const THEME_STORAGE_KEY = "dalTheme";
+const IFRAME_BLOCKED_DOMAINS = [
+  "play.google.com",
+  "apps.apple.com",
+  "instagram.com",
+  "facebook.com",
+  "tiktok.com",
+  "youtube.com",
+  "linkedin.com",
+  "uptodown.com"
+];
+let iframeFallbackTimer;
 const CAMPAIGN_PACKAGE_TABLES = {
   reach: [
   {
@@ -307,17 +320,44 @@ function closeModal() {
 
 function openIframe(url, title) {
   iframeTitle.textContent = title || "Dal Syria";
+  iframeExternalLink.href = url;
+  iframeFallback.hidden = true;
+  linkFrame.hidden = false;
   linkFrame.src = url;
   iframeModal.classList.add("is-open");
   iframeModal.setAttribute("aria-hidden", "false");
   document.body.style.overflow = "hidden";
+
+  clearTimeout(iframeFallbackTimer);
+  iframeFallbackTimer = window.setTimeout(() => {
+    if (shouldUseExternalFallback(url)) {
+      showIframeFallback();
+    }
+  }, 900);
 }
 
 function closeIframe() {
   iframeModal.classList.remove("is-open");
   iframeModal.setAttribute("aria-hidden", "true");
+  clearTimeout(iframeFallbackTimer);
   linkFrame.src = "about:blank";
+  linkFrame.hidden = false;
+  iframeFallback.hidden = true;
   document.body.style.overflow = modal.classList.contains("is-open") ? "hidden" : "";
+}
+
+function shouldUseExternalFallback(url) {
+  try {
+    const host = new URL(url).hostname.replace(/^www\./, "");
+    return IFRAME_BLOCKED_DOMAINS.some((domain) => host === domain || host.endsWith(`.${domain}`));
+  } catch (error) {
+    return false;
+  }
+}
+
+function showIframeFallback() {
+  linkFrame.hidden = true;
+  iframeFallback.hidden = false;
 }
 
 function hideQuickContactMenu() {

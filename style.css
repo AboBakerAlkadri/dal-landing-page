@@ -1268,6 +1268,45 @@ input[type="range"] {
   background: #fff;
 }
 
+.iframe-fallback {
+  min-height: 360px;
+  height: 100%;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 16px;
+  padding: 28px;
+  text-align: center;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--card-soft);
+}
+
+.iframe-fallback[hidden] {
+  display: none;
+}
+
+.iframe-fallback i {
+  width: 58px;
+  height: 58px;
+  display: grid;
+  place-items: center;
+  color: #111;
+  background: var(--yellow);
+  border-radius: 50%;
+  font-size: 1.35rem;
+}
+
+.iframe-fallback p {
+  margin: 0;
+  color: var(--text);
+  font-weight: 900;
+}
+
+.iframe-fallback .primary-btn {
+  width: min(100%, 260px);
+}
+
 .form-message {
   min-height: 24px;
   margin: 14px 0 0;
