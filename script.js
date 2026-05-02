@@ -881,19 +881,25 @@ function populateGovernorates() {
 
   form.allSyria.addEventListener("change", updateGovernorateSelection);
   form.querySelectorAll('input[name="governorates"]').forEach((checkbox) => {
-    checkbox.addEventListener("change", () => updateGovernorateSelection(checkbox));
+    checkbox.addEventListener("click", (event) => handleGovernorateClick(event, checkbox));
   });
 }
 
-function updateGovernorateSelection(changedCheckbox = null) {
-  if (changedCheckbox && form.allSyria.checked) {
+function handleGovernorateClick(event, checkbox) {
+  if (form.allSyria.checked) {
+    event.preventDefault();
     form.allSyria.checked = false;
-    changedCheckbox.checked = true;
+    form.querySelectorAll('input[name="governorates"]').forEach((item) => {
+      item.checked = item === checkbox;
+    });
+    return;
   }
+}
 
+function updateGovernorateSelection() {
   const allChecked = form.allSyria.checked;
   form.querySelectorAll('input[name="governorates"]').forEach((checkbox) => {
-    checkbox.checked = allChecked ? true : checkbox.checked;
+    checkbox.checked = allChecked;
   });
 }
 
