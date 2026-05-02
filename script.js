@@ -258,7 +258,7 @@ document.querySelectorAll("[data-link]").forEach((element) => {
     if (LINKS[key].startsWith("http") && !element.hasAttribute("data-direct-link")) {
       element.addEventListener("click", (event) => {
         event.preventDefault();
-        openIframe(LINKS[key], element.textContent.trim() || "Dal Syria");
+        openIframe(LINKS[key], element.textContent.trim() || "تطبيق دال");
       });
     }
   }
@@ -319,7 +319,7 @@ function closeModal() {
 }
 
 function openIframe(url, title) {
-  iframeTitle.textContent = title || "Dal Syria";
+  iframeTitle.textContent = title || "تطبيق دال";
   iframeExternalLink.href = url;
   iframeFallback.hidden = true;
   linkFrame.hidden = false;
