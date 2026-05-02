@@ -241,6 +241,12 @@
             رفع شعار المؤسسة أو الموقع اختياري
             <input type="file" name="companyLogo" accept="image/*">
           </label>
+          <div class="logo-upload-preview" id="logoUploadPreview" hidden>
+            <img src="" id="uploadedLogoPreview" alt="معاينة الشعار المرفوع">
+            <button class="upload-preview-remove" type="button" id="clearLogo" aria-label="حذف الشعار">
+              <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+            </button>
+          </div>
           <label>
             الاسم اختياري
             <input type="text" name="customerName" placeholder="اسمك">
@@ -284,12 +290,7 @@
 
           <article class="ad-preview">
             <div class="preview-head">
-              <div class="preview-logo-wrap">
-                <img src="dal-icon.jpg" id="previewLogo" alt="">
-                <button class="preview-logo-remove" type="button" id="clearLogo" aria-label="حذف الشعار" hidden>
-                  <i class="fa-solid fa-xmark" aria-hidden="true"></i>
-                </button>
-              </div>
+              <img src="dal-icon.jpg" id="previewLogo" alt="">
               <div>
                 <strong>Dal Syria</strong>
                 <span>إعلان ممول · <i class="fa-solid fa-earth-americas" aria-hidden="true"></i></span>

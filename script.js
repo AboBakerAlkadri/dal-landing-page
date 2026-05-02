@@ -41,6 +41,8 @@ const previewLong = document.getElementById("previewLong");
 const previewImage = document.getElementById("previewImage");
 const previewCta = document.getElementById("previewCta");
 const previewLogo = document.getElementById("previewLogo");
+const logoUploadPreview = document.getElementById("logoUploadPreview");
+const uploadedLogoPreview = document.getElementById("uploadedLogoPreview");
 const governorateOptions = document.getElementById("governorateOptions");
 const languageSummary = document.getElementById("languageSummary");
 const clearImagesButton = document.getElementById("clearImages");
@@ -795,6 +797,12 @@ function updatePreviewLogo() {
   const file = form.companyLogo.files[0];
   if (!file) {
     previewLogo.src = "dal-icon.jpg";
+    if (logoUploadPreview) {
+      logoUploadPreview.hidden = true;
+    }
+    if (uploadedLogoPreview) {
+      uploadedLogoPreview.removeAttribute("src");
+    }
     if (clearLogoButton) {
       clearLogoButton.hidden = true;
     }
@@ -803,6 +811,12 @@ function updatePreviewLogo() {
 
   previewLogoUrl = URL.createObjectURL(file);
   previewLogo.src = previewLogoUrl;
+  if (uploadedLogoPreview) {
+    uploadedLogoPreview.src = previewLogoUrl;
+  }
+  if (logoUploadPreview) {
+    logoUploadPreview.hidden = false;
+  }
   if (clearLogoButton) {
     clearLogoButton.hidden = false;
   }
@@ -872,8 +886,9 @@ function populateGovernorates() {
 }
 
 function updateGovernorateSelection(changedCheckbox = null) {
-  if (changedCheckbox?.checked && form.allSyria.checked) {
+  if (changedCheckbox && form.allSyria.checked) {
     form.allSyria.checked = false;
+    changedCheckbox.checked = true;
   }
 
   const allChecked = form.allSyria.checked;
@@ -1206,6 +1221,12 @@ function clearSavedFormState() {
   if (previewLogoUrl) {
     URL.revokeObjectURL(previewLogoUrl);
     previewLogoUrl = "";
+  }
+  if (logoUploadPreview) {
+    logoUploadPreview.hidden = true;
+  }
+  if (uploadedLogoPreview) {
+    uploadedLogoPreview.removeAttribute("src");
   }
   if (clearLogoButton) {
     clearLogoButton.hidden = true;
