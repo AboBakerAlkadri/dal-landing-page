@@ -858,6 +858,10 @@ input[type="range"] {
   background: var(--card-soft);
 }
 
+.multi-select-menu--inline {
+  grid-template-columns: 1fr 1fr;
+}
+
 .governorate-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;

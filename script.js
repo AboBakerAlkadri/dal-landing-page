@@ -574,6 +574,12 @@ function validateCurrentStep() {
       return false;
     }
 
+    if (getSelectedGenders().length === 0) {
+      showMessage("يرجى اختيار الجنس: ذكور أو اناث أو الاثنين معًا.", "error");
+      form.querySelector('input[name="gender"]')?.focus();
+      return false;
+    }
+
     if (getSelectedLanguages().length === 0) {
       showMessage("يرجى اختيار لغة واحدة على الأقل.", "error");
       languageSummary.focus();
@@ -1104,7 +1110,7 @@ async function buildPayload() {
     governorates: selectedGovernorates.join(", "),
     ageFrom: form.ageFrom.value,
     ageTo: form.ageTo.value,
-    gender: form.gender.value,
+    gender: getSelectedGenders().join(", "),
     languages: getSelectedLanguages().join(", "),
     caption: form.caption.value.trim(),
     shortDescription: form.shortDescription.value.trim(),
@@ -1332,6 +1338,10 @@ function clearSavedFormState() {
 
 function getSelectedLanguages() {
   return Array.from(form.querySelectorAll('input[name="languages"]:checked')).map((checkbox) => checkbox.value);
+}
+
+function getSelectedGenders() {
+  return Array.from(form.querySelectorAll('input[name="gender"]:checked')).map((checkbox) => checkbox.value);
 }
 
 function formatNumber(value) {

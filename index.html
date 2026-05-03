@@ -221,14 +221,13 @@
               </div>
             </label>
           </div>
-          <label>
-            الجنس
-            <select name="gender" required>
-              <option value="" selected disabled hidden>اختر الجنس</option>
-              <option value="ذكور">ذكور</option>
-              <option value="اناث">اناث</option>
-            </select>
-          </label>
+          <div class="multi-select">
+            <span>الجنس</span>
+            <div class="multi-select-menu multi-select-menu--inline" role="group" aria-label="الجنس">
+              <label class="check-row"><input type="checkbox" name="gender" value="ذكور"> ذكور</label>
+              <label class="check-row"><input type="checkbox" name="gender" value="اناث"> اناث</label>
+            </div>
+          </div>
           <div class="multi-select" id="languageDropdown">
             <span>اللغات</span>
             <details>
@@ -367,6 +366,6 @@
     </section>
   </div>
 
-  <script src="script.js?v=20260502-arabic-branding"></script>
+  <script src="script.js?v=20260503-gender-multiple"></script>
 </body>
 </html>
