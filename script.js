@@ -12,6 +12,8 @@ const LINKS = {
   rateApp: "https://play.google.com/store/apps/details?id=com.yashamDigital.dal&hl",
   jobs: "https://dalsyria.com/jobs",
   jobsApply: "https://dalsyria.com/jobs/apply",
+  marketingJob: "https://forms.gle/m3EnKxs8nLr5BwwX9",
+  advertisingFaceJob: "https://forms.gle/TNwFMSb2bCV2faCr9",
   whatsapp: "https://wa.me/963939769472",
   facebook: "https://www.facebook.com/dalsyriacom",
   instagram: "https://www.instagram.com/dalsyriacom",
