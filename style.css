@@ -140,8 +140,31 @@ button {
   color: var(--yellow);
 }
 
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+
 .hero {
   padding: 12px 0 8px;
+}
+
+.hero--banner {
+  padding-top: 12px;
+}
+
+.hero-banner {
+  width: 100%;
+  display: block;
+  aspect-ratio: 1600 / 560;
+  object-fit: cover;
+  border: 1px solid rgba(255, 224, 27, 0.28);
+  border-radius: 18px;
+  box-shadow: var(--shadow);
 }
 
 .hero-brand-row {
