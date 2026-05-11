@@ -20,8 +20,6 @@ const CAMPAIGN_HEADERS = [
   "هدف الإعلان",
   "الميزانية",
   "عدد الأيام",
-  "الوصول اليومي",
-  "إجمالي الوصول",
   "إجمالي التكلفة",
   "المحافظة",
   "العمر من",
@@ -115,8 +113,6 @@ function buildCampaignRow(data, uploadedImages, uploadedLogo) {
     data.campaignGoal || "",
     asDollarValue(data.budget),
     data.days || "",
-    data.dailyReach || "",
-    data.totalReach || "",
     asDollarValue(data.totalCost || data.budget),
     data.governorates || "",
     data.ageFrom || "",
@@ -205,7 +201,7 @@ function formatCampaignRow(sheet, rowNumber) {
     .setBorder(true, true, true, true, true, true, "#000000", SpreadsheetApp.BorderStyle.SOLID);
 
   sheet.getRange(rowNumber, 3).setNumberFormat("$#,##0");
-  sheet.getRange(rowNumber, 7).setNumberFormat("$#,##0");
+  sheet.getRange(rowNumber, 5).setNumberFormat("$#,##0");
 }
 
 function saveDriveFiles(files) {
